@@ -1,0 +1,34 @@
+---
+import Base from "../layouts/Base.astro";
+import Matrix from "../components/ConformanceMatrix.astro";
+import coverage from "../content/coverage.json";
+import { conformanceSource as source } from "../content/conformance_source";
+const sections = [
+  { id: "panel", title: "Panel modality", arms: coverage.arms, renderers: Object.keys(coverage.renderers) },
+  ...Object.entries(coverage.modalities).map(([id, section]) => ({
+    id, title: `${id[0].toUpperCase()}${id.slice(1)} modality`, arms: section.arms,
+    renderers: Object.keys(Object.values(section.arms)[0].renderers),
+  })),
+];
+const cells = sections.flatMap(section => Object.values(section.arms).flatMap(arm => Object.values(arm.renderers)));
+const counts = Object.entries(coverage.statuses).map(([status, description]) => ({
+  status, description, count: cells.filter(cell => cell.status === status).length,
+}));
+const sourceUrl = `https://github.com/${source.repository}/blob/${source.revision}/${source.path}`;
+---
+<Base title="Renderer conformance | meridian-ux" description="Manifest-generated renderer coverage, including declared gaps, specialized degradation, and unverified previews.">
+  <section class="feature-hero">
+    <span class="eyebrow">the evidence</span>
+    <h1>One manifest.<br /><span class="grad-text">Every declared cell.</span></h1>
+    <p class="sub">This page is generated from the canonical coverage manifest, not a separately authored parity claim. “Renders” is a declared status, not a blanket certification of release readiness.</p>
+    <p>Source: <a class="source" href={sourceUrl}><code>{source.repository}@{source.revision.slice(0, 12)}</code></a>. This is an immutable build snapshot; previews marked unverified are not counted as proven parity.</p>
+    <p>{cells.length} cells across {sections.length} modalities.</p>
+    <ul>{counts.filter(item => item.count).map(item => <li><strong>{item.count} {item.status}</strong> — {item.description}</li>)}</ul>
+  </section>
+  {sections.map(section => <Matrix {...section} />)}
+</Base>
+<style>
+  .feature-hero { padding-bottom: 1rem; }
+  .source { text-decoration: underline; }
+  li { margin: .5rem 0; }
+</style>

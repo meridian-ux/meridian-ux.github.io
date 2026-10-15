@@ -13,6 +13,15 @@ exports_files([
 
 npm_link_all_packages(name = "node_modules")
 
+js_test(
+    name = "conformance_import_test",
+    entry_point = "tools/sync_conformance.test.mjs",
+    data = [
+        "tools/sync_conformance.mjs",
+        "src/content/coverage.json",
+    ],
+)
+
 # The astro CLI as a hermetic js_binary tool.
 astro_bin.astro_binary(name = "astro_tool")
 
@@ -61,6 +70,7 @@ js_test(
         ":build",
         "astro.config.mjs",
         "src/content/features.json",
+        "src/content/coverage.json",
     ],
     entry_point = "tools/smoke_test.mjs",
 )

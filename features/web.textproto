@@ -20,7 +20,7 @@ meta {
   og_generate: false
 }
 highlights: "Vanilla + React ComponentKit (meridian-web-react · meridian-mui-kit)"
-highlights: "Renders every meridian.ui.v1 panel shape"
+highlights: "Panel support and specialized degradation declared in the conformance matrix"
 highlights: "Re-skins from a meridian.theme.v1 Theme (applyTheme)"
 highlights: "Bundled to static.<tenant> by git-sha"
 
