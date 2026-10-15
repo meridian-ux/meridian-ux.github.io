@@ -40,7 +40,33 @@ bazel build //:build   # hermetic build via rules_astro (Bazel 9)
 
 ## Pages
 
-`/` · `/features` + `/features/<slug>` (web · swiftui · tui · wasm) · `/404`
+`/` · `/features` + `/features/<slug>` (web · swiftui · tui · wasm) · `/conformance` · `/404`
+
+## Manifest-generated conformance
+
+`node tools/sync_conformance.mjs` resolves the public `meridian-ux/meridian`
+main branch to an immutable SHA and imports its canonical
+`schemas/conformance/coverage.json` into `src/content/coverage.json`, alongside
+generated source provenance. Every deploy refreshes this snapshot before the
+offline Astro build. Import failure stops the build; it does not silently publish
+stale fallback data. The checked-in snapshot keeps local and Bazel builds
+reproducible without network access during rendering.
+
+`/conformance` derives every panel, conversation, and launchpad cell directly
+from that manifest. It exposes reasons and waivers and distinguishes unverified
+previews from declared rendering. The site smoke test verifies every emitted
+cell and its exact status. For a verified local checkout, import offline with:
+
+```bash
+node tools/sync_conformance.mjs --manifest /path/to/meridian/schemas/conformance/coverage.json --revision FULL_COMMIT_SHA
+node --test tools/sync_conformance.test.mjs
+pnpm build
+node tools/smoke_test.mjs
+```
+
+PR validation builds and tests without deploying. The existing main-branch
+workflow still deploys GitHub Pages; merging a site PR therefore needs deployment
+authorization in addition to normal review/CI approval.
 
 ## Brand
 

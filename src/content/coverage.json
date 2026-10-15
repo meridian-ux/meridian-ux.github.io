@@ -1,0 +1,850 @@
+{
+  "$schema-note": "Coverage of meridian.ui.v1.PanelDescriptor's `body` oneof, per renderer. Checked against proto/panel.proto and renderer_catalog.json by tools/check_coverage.mjs: renderer and arm sets must match exactly, every non-'renders' cell must carry a reason, and full-parity gaps or unverified cells must carry a waiver. Adding a renderer or arm without declaring its coverage fails.",
+  "statuses": {
+    "renders": "The renderer draws the shape.",
+    "placeholder": "The renderer draws an explanatory placeholder instead of the shape.",
+    "separate-entrypoint": "Drawn, but by a dedicated entrypoint outside the main dispatch.",
+    "missing": "Not implemented.",
+    "structural-gap": "Retired historical status: no renderer cell may use it; the gate rejects it even with a waiver.",
+    "unverified": "The renderer is public, but its behavior has not been verified in this repository.",
+    "not-applicable": "This tier does not own the shape."
+  },
+  "parity": {
+    "full": "panel.proto: every modality realizes it at full fidelity.",
+    "specialized": "panel.proto: cannot meet the parity bar; documents a degradation ladder.",
+    "standard": "A fetch/interactive shape with no explicit parity declaration."
+  },
+  "renderers": {
+    "web-components": {
+      "repo": "meridian-web",
+      "entrypoint": "src/uiview/renderer.ts"
+    },
+    "web-react": {
+      "repo": "meridian-web-react",
+      "entrypoint": "src/panel_renderer.tsx"
+    },
+    "mui-kit": {
+      "repo": "meridian-mui-kit",
+      "entrypoint": "src/mui_kit.tsx"
+    },
+    "html-kit": {
+      "repo": "meridian-web-react",
+      "entrypoint": "src/html_kit.tsx"
+    },
+    "shadcn-kit": {
+      "repo": "meridian-web-react",
+      "entrypoint": "src/shadcn_kit.tsx"
+    },
+    "tui": {
+      "repo": "meridian-tui",
+      "entrypoint": "rust/tui/src/widget.rs"
+    },
+    "swiftui": {
+      "repo": "meridian-ui",
+      "entrypoint": "External preview; source is not available in this repository."
+    }
+  },
+  "modalities": {
+    "conversation": {
+      "oneof": "Block.kind",
+      "arms": {
+        "markdown": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "context": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "tool": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "list": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "fields": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "code": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "divider": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "table": {
+          "renderers": {
+            "chat-html": {
+              "status": "renders"
+            },
+            "chat-react": {
+              "status": "renders"
+            }
+          }
+        },
+        "view": {
+          "renderers": {
+            "chat-html": {
+              "status": "not-applicable",
+              "reason": "The framework-free HTML tier has no host panel-renderer seam; it intentionally leaves composed ViewDescriptor blocks inert."
+            },
+            "chat-react": {
+              "status": "separate-entrypoint",
+              "reason": "BlockView delegates the nested ViewDescriptor to the host-supplied renderView callback rather than importing a panel renderer."
+            }
+          }
+        }
+      }
+    },
+    "launchpad": {
+      "oneof": "Command.action",
+      "arms": {
+        "rpc": {
+          "renderers": {
+            "launchpad": {
+              "status": "renders"
+            }
+          }
+        },
+        "open_panel": {
+          "renderers": {
+            "launchpad": {
+              "status": "renders"
+            }
+          }
+        },
+        "open_view_id": {
+          "renderers": {
+            "launchpad": {
+              "status": "renders"
+            }
+          }
+        },
+        "navigate": {
+          "renderers": {
+            "launchpad": {
+              "status": "renders"
+            }
+          }
+        }
+      }
+    }
+  },
+  "arms": {
+    "table": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "lro": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI renders LRO inputs and run affordance text; hosts handle the long-running operation transport."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "adhoc": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "not-applicable",
+          "reason": "AdhocPanel is dispatched by the core via the handler registry, not by a kit."
+        },
+        "html-kit": {
+          "status": "not-applicable",
+          "reason": "AdhocPanel is dispatched by the core via the handler registry, not by a kit."
+        },
+        "shadcn-kit": {
+          "status": "not-applicable",
+          "reason": "AdhocPanel is dispatched by the core via the handler registry, not by a kit."
+        },
+        "tui": {
+          "status": "placeholder",
+          "reason": "AdhocPanel is dispatched by the core via the handler registry, not by a kit."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "prompt": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders",
+          "reason": "The web-components renderer paints prompt descriptions, detail, typed controls, and confirmation/form actions."
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "separate-entrypoint",
+          "reason": "Rendered by a dedicated one-shot entrypoint (render_prompt / render_llm_prompt) rather than by PanelView's dispatch."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "llm_prompt": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders",
+          "reason": "The web-components renderer displays prompt templates, model metadata, and declared parameter slots."
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders",
+          "reason": "The MUI kit renders model metadata, system/user templates, and typed parameter-slot controls in preview mode."
+        },
+        "html-kit": {
+          "status": "renders",
+          "reason": "htmlKit renders model metadata, templates, output schema, and typed parameter controls with local textual preview."
+        },
+        "shadcn-kit": {
+          "status": "renders",
+          "reason": "shadcnKit shares the typed parameter-fill and local textual preview implementation with htmlKit."
+        },
+        "tui": {
+          "status": "separate-entrypoint",
+          "reason": "Rendered by a dedicated one-shot entrypoint (render_prompt / render_llm_prompt) rather than by PanelView's dispatch."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "gallery": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders",
+          "reason": "The web-components renderer fetches rows and renders gallery cards with image, icon, subtitle, status, action, and href fields."
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI renders populated gallery cards as selectable text, retaining title, subtitle, status, links, and actions."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "form": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI renders form fields as labeled terminal controls with read-only and editable modes plus defaults."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "choice": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "snippet": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "action": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "connect_flow": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "copy_value": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "catalog": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "terminal": {
+      "parity": "specialized",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders",
+          "reason": "PanelRenderer provides an accessible connection-metadata fallback when a React kit omits the specialized terminal component."
+        },
+        "mui-kit": {
+          "status": "renders",
+          "reason": "The MUI kit renders an accessible terminal connection fallback with tool, URL, and dimensions."
+        },
+        "html-kit": {
+          "status": "renders",
+          "reason": "The HTML kit renders an accessible terminal connection fallback with tool, URL, and dimensions."
+        },
+        "shadcn-kit": {
+          "status": "renders",
+          "reason": "The shadcn kit renders an accessible terminal connection fallback with tool, URL, and dimensions."
+        },
+        "tui": {
+          "status": "placeholder",
+          "reason": "The TUI keeps an explanatory placeholder because terminal.proto defines this arm as web-specific."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "grammar": {
+      "parity": "specialized",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "stat": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "detail_header": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders",
+          "reason": "The dependency-free HTML kit renders the record fields as an accessible definition list."
+        },
+        "shadcn-kit": {
+          "status": "renders",
+          "reason": "The shadcn kit renders record fields as an accessible definition list."
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI fetches the record once and renders detail titles, descriptor rows, and read-only fields as text."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "record_card": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders",
+          "reason": "The dependency-free HTML kit renders record fields as an accessible definition list."
+        },
+        "shadcn-kit": {
+          "status": "renders",
+          "reason": "The shadcn kit renders record fields as an accessible definition list."
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI fetches the record once and renders read-only fields as labeled text."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "resource_cards": {
+      "parity": "standard",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders",
+          "reason": "The React renderer fetches rows and renders metadata, status, visibility-gated actions, and confirmation controls."
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI renders resource-card rows as selectable numbered text cards with metadata and visible actions."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "chart": {
+      "parity": "specialized",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders",
+          "reason": "MeridianChart renders portable chart intent and fetched rows as an accessible data table."
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders",
+          "reason": "The shadcn kit renders the portable chart mark, title, and x/y field summary."
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI renders portable chart intent and populated rows as a bounded terminal table."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "steps": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders",
+          "reason": "The web-components renderer emits an ordered walkthrough with labels, actors, details, and optional frames."
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders",
+          "reason": "The HTML kit renders computed numbered steps with labels, actors, details, intro, outro, and media-alt fallback."
+        },
+        "shadcn-kit": {
+          "status": "renders",
+          "reason": "The shadcn kit renders computed numbered steps with labels, actors, detail, intro, and outro text."
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI renders ordered labels, actor labels, details, intro/outro, and media-alt degradation as terminal text."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    },
+    "media": {
+      "parity": "specialized",
+      "renderers": {
+        "web-components": {
+          "status": "renders",
+          "reason": "The web-components renderer realizes native image, audio, and video elements with captions, posters, duration, and chapter metadata."
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders",
+          "reason": "The HTML kit renders video, audio, and image media with poster, captions, chapters, and alt fallback semantics."
+        },
+        "shadcn-kit": {
+          "status": "renders",
+          "reason": "The shadcn kit renders video, audio, and image media with poster, captions, chapters, and alt fallback semantics."
+        },
+        "tui": {
+          "status": "renders",
+          "reason": "The TUI realizes MediaPanel's terminal degradation rung with alt text, duration, captions, chapters, and source URI."
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+        }
+      }
+    },
+    "stream": {
+      "parity": "full",
+      "renderers": {
+        "web-components": {
+          "status": "renders"
+        },
+        "web-react": {
+          "status": "renders"
+        },
+        "mui-kit": {
+          "status": "renders"
+        },
+        "html-kit": {
+          "status": "renders"
+        },
+        "shadcn-kit": {
+          "status": "renders"
+        },
+        "tui": {
+          "status": "renders"
+        },
+        "swiftui": {
+          "status": "unverified",
+          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
+        }
+      }
+    }
+  }
+}

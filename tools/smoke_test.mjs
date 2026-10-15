@@ -71,7 +71,7 @@ const features = catalog
 if (!catalog) fail("src/content/features.json not found — cannot derive feature routes");
 else if (features.length === 0) fail("features.json lists no features — the catalog is empty");
 
-const ROUTES = ["", "features", ...features.map((f) => `features/${f.slug}`)];
+const ROUTES = ["", "features", "conformance", ...features.map((f) => `features/${f.slug}`)];
 const before = fails;
 for (const r of ROUTES) {
   const f = join(DIST, r, "index.html");
@@ -79,6 +79,29 @@ for (const r of ROUTES) {
 }
 if (!existsSync(join(DIST, "404.html"))) fail("404.html was not emitted");
 if (fails === before) ok(`${ROUTES.length} routes + 404 emitted (${features.length} from the catalog)`);
+
+console.log("== manifest conformance ==");
+const coverageFile = ["src/content/coverage.json", "_main/src/content/coverage.json"]
+  .map(path => join(process.cwd(), path)).find(path => existsSync(path));
+if (!coverageFile) fail("canonical coverage snapshot missing");
+else if (existsSync(join(DIST, "conformance/index.html"))) {
+  const coverage = JSON.parse(readFileSync(coverageFile, "utf8"));
+  const sections = { panel: { arms: coverage.arms }, ...coverage.modalities };
+  const html = readFileSync(join(DIST, "conformance/index.html"), "utf8");
+  let expected = 0;
+  for (const [modality, section] of Object.entries(sections)) {
+    for (const [arm, entry] of Object.entries(section.arms)) {
+      for (const [renderer, cell] of Object.entries(entry.renderers)) {
+        expected++;
+        const marker = `data-cell="${modality}.${arm}.${renderer}" data-status="${cell.status}"`;
+        if (!html.includes(marker)) fail(`conformance is missing or misstating ${modality}.${arm}.${renderer}`);
+      }
+    }
+  }
+  const actual = [...html.matchAll(/data-cell="/g)].length;
+  if (actual !== expected) fail(`conformance emitted ${actual} cells, expected ${expected}`);
+  else ok(`${expected} source-derived cell statuses emitted`);
+}
 
 console.log("== internal links ==");
 const present = new Set();

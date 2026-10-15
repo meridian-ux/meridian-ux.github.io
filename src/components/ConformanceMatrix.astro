@@ -1,0 +1,40 @@
+---
+const { id, title, arms, renderers } = Astro.props;
+---
+<section aria-labelledby={`${id}-heading`}>
+  <h2 id={`${id}-heading`}>{title}</h2>
+  <div class="matrix-scroll" tabindex="0" role="region" aria-label={`${title} coverage matrix`}>
+    <table>
+      <caption>Declared status for every arm and renderer. Expand a status for its reason or waiver.</caption>
+      <thead><tr><th scope="col">Arm</th>{renderers.map(renderer => <th scope="col">{renderer}</th>)}</tr></thead>
+      <tbody>{Object.entries(arms).map(([arm, entry]) => <tr>
+        <th scope="row"><code>{arm}</code>{entry.parity && <small>{entry.parity}</small>}</th>
+        {renderers.map(renderer => {
+          const cell = entry.renderers[renderer];
+          return <td data-cell={`${id}.${arm}.${renderer}`} data-status={cell.status}>
+            {cell.reason || cell.waiver ? <details>
+              <summary>{cell.status}</summary>
+              {cell.reason && <p>{cell.reason}</p>}
+              {cell.waiver && <p><strong>Waiver:</strong> {cell.waiver}</p>}
+            </details> : <span>{cell.status}</span>}
+          </td>;
+        })}
+      </tr>)}</tbody>
+    </table>
+  </div>
+</section>
+<style>
+  section { padding: 2rem 0; }
+  h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+  .matrix-scroll { overflow: auto; border: 1px solid var(--line-2); border-radius: 12px; }
+  table { border-collapse: collapse; table-layout: fixed; width: 100%; min-width: 64rem; font-size: .85rem; }
+  caption { text-align: left; padding: 1rem; color: var(--muted); }
+  th, td { padding: .85rem; text-align: left; vertical-align: top; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+  thead th { color: var(--muted); }
+  tbody th { background: var(--ink-2); }
+  small { display: block; color: var(--muted); font-weight: normal; }
+  summary { cursor: pointer; }
+  td[data-status="renders"] { color: var(--ok); }
+  td[data-status="unverified"], td[data-status="placeholder"] { color: var(--gold); }
+  details p { color: var(--cream); }
+</style>

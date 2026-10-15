@@ -19,6 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Import canonical conformance snapshot
+        run: node tools/sync_conformance.mjs
+      - name: Conformance import regression tests
+        run: node --test tools/sync_conformance.test.mjs
       # No `package-manager:` input on purpose. With it set, the action passes a
       # version to pnpm/action-setup while package.json also declares
       # `packageManager`, and action-setup hard-errors on the duplicate
@@ -27,6 +34,8 @@ jobs:
       # version out of packageManager -- one declaration, used by CI and locally.
       - name: Build Astro site
         uses: withastro/action@v3
+      - name: Verify routes and every conformance cell
+        run: node tools/smoke_test.mjs
 
   deploy:
     needs: build
