@@ -26,13 +26,12 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   name: f.name,
   applicationCategory: "DeveloperApplication",
-  operatingSystem: "Web, Linux, Kubernetes",
   description: meta.description,
-  isPartOf: { "@type": "SoftwareApplication", name: "tomato-bazel" },
+  isPartOf: { "@type": "SoftwareApplication", name: "Meridian" },
 };
 ---
 <Base title={meta.title} description={meta.description} canonical={canonical} ogImage={ogImage} jsonLd={jsonLd}>
-  <div class="breadcrumb"><a href="/features">Products</a> / {f.name}</div>
+  <div class="breadcrumb"><a href="/features/">Renderers</a> / {f.name}</div>
 
   <section class="feature-hero">
     <span class="eyebrow">{hero.eyebrow || f.category?.toLowerCase()}</span>
@@ -87,12 +86,10 @@ const jsonLd = {
   )}
 
   <section class="close">
-    <h2>One graph, from source to build.</h2>
-    <p>{f.name} is one of {catalog.features.length} services in the tbzl.dev source &amp; build layer — open at the edges, yours at the core.</p>
+    <h2>Explore Meridian</h2>
     <div class="cta-row">
-      <a class="btn btn-primary" href="/#start">Get started</a>
-      <a class="btn btn-ghost" href="https://docs.tbzl.dev">Read the docs ↗</a>
-      <a class="btn btn-plain" href="/features">All products →</a>
+      <a class="btn btn-primary" href="/conformance/">Check renderer coverage</a>
+      <a class="btn btn-plain" href="/features/">All renderers →</a>
     </div>
   </section>
 </Base>

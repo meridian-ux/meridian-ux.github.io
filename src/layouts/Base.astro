@@ -8,6 +8,7 @@ const {
   description,
   canonical = new URL(Astro.url.pathname, Astro.site).href,
   ogImage = "/assets/og/default.png",
+  noindex = false,
   jsonLd,
 } = Astro.props;
 const ogUrl = new URL(ogImage, Astro.site).href;
@@ -20,13 +21,13 @@ const ogUrl = new URL(ogImage, Astro.site).href;
   <script is:inline>document.documentElement.classList.add("js");</script>
   <title>{title}</title>
   <meta name="description" content={description} />
-  <link rel="canonical" href={canonical} />
+  {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
   <link rel="icon" type="image/png" href="/assets/meridian-mark.png" />
 
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content={canonical} />
+  {!noindex && <meta property="og:url" content={canonical} />}
   <meta property="og:image" content={ogUrl} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />

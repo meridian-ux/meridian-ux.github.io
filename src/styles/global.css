@@ -1,7 +1,4 @@
-/* tomato-bazel (tbzl.dev) — shared styles. Sibling of fastverk's midnight skin,
-   re-skinned to the official tomato-bazel/brand: same ink ground (#131419), the
-   amber accent swapped for tomato red, the "ok" green swapped for the Bazel-leaning
-   calyx leaf green. Single committed dark world. */
+/* Shared Meridian styles. */
 @font-face {
   font-family: "Space Grotesk"; font-weight: 600; font-display: swap;
   src: url("/assets/fonts/SpaceGrotesk-SemiBold.ttf") format("truetype");
@@ -401,12 +398,12 @@ footer nav a:hover { color: var(--cream); }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
-   tomato-bazel home additions — new components layered on the shared system.
+   Additional homepage styles.
    Reuses .chain/.link, .feature-grid/.fcard, .constell/.chips, .panel-*,
    .receipts, .band-head, .hero, .thesis, .btn, .eyebrow from above.
    ───────────────────────────────────────────────────────────────────────── */
 
-/* angular tomato mark — transparent, no rounded tile */
+/* Meridian mark */
 .brand img { width: 32px; height: 32px; display: block; border-radius: 0; }
 footer .fbrand img, footer .fbrand svg { width: 22px; height: 22px; display: block; }
 
