@@ -1,4 +1,5 @@
 ---
+import { Code } from "astro:components";
 import html from "../examples/quickstart/index.html?raw";
 import descriptor from "../examples/quickstart/panel.json?raw";
 import app from "../examples/quickstart/main.jsx?raw";
@@ -18,23 +19,23 @@ npm install --save-exact \\
 
   <h3>1. Install the packages</h3>
   <p>This example uses the published <code>@savvifi</code> packages from npm.</p>
-  <pre><code>{install}</code></pre>
+  <Code code={install} lang="bash" wrap />
 
   <h3>2. Create the descriptor</h3>
   <p>Save this Protobuf JSON as <code>panel.json</code>. The <code>stat</code> field selects the stat panel renderer.</p>
-  <pre><code>{descriptor.trimEnd()}</code></pre>
+  <Code code={descriptor.trimEnd()} lang="json" wrap />
 
   <h3>3. Mount the panel</h3>
   <p>Create <code>index.html</code> and <code>main.jsx</code> in the same directory. The renderer decodes the descriptor and displays the value locally.</p>
   <div class="files">
     <p><code>index.html</code></p>
-    <pre><code>{html.trimEnd()}</code></pre>
+    <Code code={html.trimEnd()} lang="html" wrap />
     <p><code>main.jsx</code></p>
-    <pre><code>{app.trimEnd()}</code></pre>
+    <Code code={app.trimEnd()} lang="jsx" wrap />
   </div>
 
   <h3>4. Run it</h3>
-  <pre><code>npx vite --host 127.0.0.1</code></pre>
+  <Code code="npx vite --host 127.0.0.1" lang="bash" wrap />
   <p>Open the local URL Vite prints. You should see <strong>Deployments</strong> and <strong>42</strong>. Change the value in <code>panel.json</code> to see it update.</p>
   <a href="/features/">Explore the renderers →</a>
 </section>
@@ -44,9 +45,9 @@ npm install --save-exact \\
   h2 { font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.05em; margin: 0; }
   h3 { font-size: 1.25rem; margin: 30px 0 0; }
   p { max-width: 68ch; color: var(--muted); margin: 8px 0 12px; }
-  pre { max-width: 76ch; overflow: auto; margin: 0 0 16px; padding: 14px 16px; border: 1px solid var(--line-2); background: var(--ink-2); }
+  .quickstart :global(pre.astro-code) { max-inline-size: min(100%, 76ch); overflow: auto; margin: 0 0 16px; padding: 14px clamp(10px, 3vw, 16px); border: 1px solid var(--line-2); }
   code { font: .85em/1.6 var(--mono); overflow-wrap: anywhere; }
-  pre code { font-size: .82rem; overflow-wrap: normal; }
+  .quickstart :global(pre.astro-code code) { font: .82rem/1.6 var(--mono); overflow-wrap: anywhere; }
   .files p { color: var(--cream); }
   a { text-decoration: underline; text-underline-offset: .28em; }
 </style>

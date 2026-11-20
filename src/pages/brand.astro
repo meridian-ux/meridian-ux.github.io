@@ -1,0 +1,36 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="Brand colors — Meridian" description="Meridian’s brand palette, typography, and theme sizing.">
+  <section class="brand-guide">
+    <h1>Brand colors</h1>
+    <p>The Meridian theme pairs cool neutrals with an azure-to-violet accent.</p>
+    <ul class="swatches" aria-label="Meridian brand palette">
+      {[
+        ["Ink", "#131419"], ["Paper", "#E9EAF3"], ["Cyan", "#3ED9E0"],
+        ["Azure", "#6E8BFF"], ["Violet", "#9A7CF0"], ["Green", "#57D98B"],
+      ].map(([label, value]) => (
+        <li><span style={`background:${value}`}></span>{label}<code>{value}</code></li>
+      ))}
+    </ul>
+    <div class="type-samples">
+      <div><strong>4 px</strong><p>Spacing unit</p></div>
+      <div><strong>8 px</strong><p>Component radius</p></div>
+      <div><strong>Space Grotesk</strong><p>Display and interface</p></div>
+      <div><code>System mono</code><p>Descriptors, commands, and data</p></div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .brand-guide { padding: clamp(48px, 9vw, 100px) 0; }
+  h1 { font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: -.055em; line-height: 1.1; margin: 0; }
+  .brand-guide > p { color: var(--muted); }
+  .swatches { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; list-style: none; margin: 30px 0; padding: 0; }
+  .swatches code { display: block; color: var(--muted); font-size: .75rem; }
+  .swatches span { display: block; height: 52px; border: 1px solid var(--line-2); border-radius: 2px; margin-bottom: 6px; }
+  .type-samples { display: flex; flex-wrap: wrap; gap: 20px 60px; }
+  .type-samples strong, .type-samples code { font-size: 1.25rem; }
+  .type-samples p { color: var(--muted); margin: 0; }
+  @media (max-width: 520px) { .swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

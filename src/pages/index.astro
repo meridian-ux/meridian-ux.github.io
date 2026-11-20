@@ -12,25 +12,6 @@ import Quickstart from "../components/Quickstart.astro";
 
   <Gallery />
 
-  <section class="chapter" id="skins">
-    <h2>Foundations</h2>
-    <p>The Meridian theme pairs cool neutrals with an azure-to-violet accent.</p>
-    <ul class="swatches" aria-label="Meridian brand palette">
-      {[
-        ["Ink", "#131419"], ["Paper", "#E9EAF3"], ["Cyan", "#3ED9E0"],
-        ["Azure", "#6E8BFF"], ["Violet", "#9A7CF0"], ["Green", "#57D98B"],
-      ].map(([label, value]) => (
-        <li><span style={`background:${value}`}></span>{label}<code>{value}</code></li>
-      ))}
-    </ul>
-    <div class="type-samples">
-      <div><strong>4 px</strong><p>Spacing unit</p></div>
-      <div><strong>8 px</strong><p>Component radius</p></div>
-      <div><strong>Space Grotesk</strong><p>Display and interface</p></div>
-      <div><code>System mono</code><p>Descriptors, commands, and data</p></div>
-    </div>
-  </section>
-
   <section class="chapter" id="semantics">
     <h2>Shared semantics</h2>
     <dl class="semantics">
@@ -60,9 +41,6 @@ import Quickstart from "../components/Quickstart.astro";
   .intro a, .chapter a { text-decoration: underline; text-underline-offset: .28em; }
   .chapter { border-top: 1px solid var(--line-2); padding: 52px 0; }
   .chapter h2 { font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.05em; margin: 0; }
-  .swatches { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; list-style: none; margin: 30px 0; padding: 0; }
-  .swatches code { display: block; color: var(--muted); font-size: .75rem; }
-  .swatches span { display: block; height: 52px; border: 1px solid var(--line-2); border-radius: 2px; margin-bottom: 6px; }
   .semantics { margin: 20px 0; }
   .semantics div { display: grid; grid-template-columns: minmax(95px, 1fr) 3fr; gap: 8px 20px; border-top: 1px solid var(--line); padding: 10px 0; }
   .semantics dd { margin: 0; }
@@ -72,8 +50,4 @@ import Quickstart from "../components/Quickstart.astro";
   .warning { color: var(--gold); }
   .danger { color: var(--block); }
   .accent { color: var(--amber); }
-  .type-samples { display: flex; flex-wrap: wrap; gap: 20px 60px; }
-  .type-samples strong, .type-samples code { font-size: 1.25rem; }
-  .type-samples p { color: var(--muted); margin: 0; }
-  @media (max-width: 520px) { .swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 </style>
