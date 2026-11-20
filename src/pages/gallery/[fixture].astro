@@ -10,6 +10,9 @@ const { example } = Astro.props;
 ---
 <Guide title={example.label} description="Meridian panel fixture">
   <p><a href="/gallery/">All fixtures</a> · <a href="/conformance/">Renderer coverage</a></p>
+  <nav aria-label="Renderers">
+    {rendererChoices.map(renderer => <a style="margin-inline-end: 16px" href={`#renderer-${renderer.id}`}>{renderer.label}</a>)}
+  </nav>
   {rendererChoices.map(renderer => (
     <section aria-labelledby={`renderer-${renderer.id}`}>
       <h2 id={`renderer-${renderer.id}`}>{renderer.label}</h2>

@@ -147,3 +147,28 @@ MERIDIAN_REQUIRE_TUI_ASSETS=1 node tools/smoke_test.mjs
 Each example has a stable fixture ID and a shared preview component. The
 renderer registry can select an interactive terminal, an image capture, or
 a placeholder, so a future native capture can use the same fixture pages.
+
+### SwiftUI captures on macOS
+
+Use a clean Meridian checkout at the revision in
+`tools/meridian-revision.txt`. Prepare its Swift package using Node.js 22, the
+repository’s pinned pnpm, Xcode 26.2 or later, and stable Rust.
+
+```bash
+cd /path/to/meridian
+pnpm install --frozen-lockfile --ignore-scripts
+rustup target add aarch64-apple-darwin x86_64-apple-darwin \
+  aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+python3 tools/swiftui.py --generate-only
+
+cd /path/to/meridian-ux.github.io
+bash tools/capture-swiftui.sh /path/to/meridian choice form stat
+bash tools/capture-swiftui.sh /path/to/meridian
+```
+
+The capture runs a temporary XCTest from the existing fixture harness and
+removes it afterward. It draws each panel in a 640 × 480 point AppKit host
+at 2× scale in light appearance. The revision in the image path ties it
+to the corresponding terminal fixture. The pinned SwiftUI view projections
+identify actual renderer placeholders. Commit the PNGs under
+`public/captures/swiftui/<revision>/` to publish them through Astro.

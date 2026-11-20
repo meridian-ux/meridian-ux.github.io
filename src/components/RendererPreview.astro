@@ -5,8 +5,13 @@ interface Props { preview: Preview; id?: string; }
 const { preview, id = "renderer-preview" } = Astro.props;
 ---
 {preview.kind === "terminal" ? <TerminalPreview {preview} {id} /> :
-  preview.kind === "capture" ? <figure id={id}><img src={preview.src} alt={preview.alt} loading="lazy" /></figure> :
+  preview.kind === "capture" ? <figure id={id}>
+    <img src={preview.src} alt={preview.alt} width={preview.width} height={preview.height} loading="lazy" />
+    <figcaption>{preview.caption} · <a href={preview.src}>Full-size image</a></figcaption>
+  </figure> :
   <p id={id}>{preview.reason}</p>}
 <style>
-  img { max-inline-size: 100%; height: auto; }
+  figure { margin: 0; }
+  img { display: block; max-inline-size: 100%; height: auto; border: 1px solid var(--line-2); }
+  figcaption { margin-top: 8px; color: var(--muted); font-size: .9rem; }
 </style>

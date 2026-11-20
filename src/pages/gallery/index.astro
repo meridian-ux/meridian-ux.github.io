@@ -2,8 +2,8 @@
 import Guide from "../../layouts/Guide.astro";
 import { panelExamples } from "../../lib/renderer-previews";
 ---
-<Guide title="Renderer gallery" description="Explore the canonical Meridian panel fixtures in the terminal renderer.">
-  <p>Each example uses a protobuf descriptor from Meridian’s conformance suite. Open a panel to see the terminal output or run it in your browser.</p>
+<Guide title="Renderer gallery" description="Compare canonical Meridian panels in the terminal and in native SwiftUI.">
+  <p>Each example uses a protobuf descriptor from Meridian’s conformance suite. Open a panel to compare the live terminal with a SwiftUI capture from macOS.</p>
   <ul class="examples">
     {panelExamples.map(example => (
       <li data-gallery-fixture={example.id}>

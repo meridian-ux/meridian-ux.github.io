@@ -3,6 +3,7 @@ import { Code } from "astro:components";
 import Guide from "../../layouts/Guide.astro";
 ---
 <Guide title="Get started with SwiftUI" description="Build the native Meridian renderer preview for macOS and iOS from source.">
+  <p><a href="/gallery/">Browse the macOS panel captures →</a></p>
   <h2>Prepare the Swift package</h2>
   <p>Use macOS with Xcode 26.2 or later, Swift 6.2 or later, stable Rust, Node.js 22, the repository’s pinned pnpm version, and Python 3. The preparer generates Swift protobuf bindings and builds the Rust XCFramework.</p>
   <Code lang="bash" wrap code={`git clone https://github.com/meridian-ux/meridian.git
