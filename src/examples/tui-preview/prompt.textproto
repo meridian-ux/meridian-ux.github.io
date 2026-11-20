@@ -1,0 +1,10 @@
+panel_id: "workspace"
+title: "Workspace setup"
+prompt {
+  description: "Name your workspace"
+  fields {
+    field_id: "workspace_name"
+    label: "Workspace name"
+    text {}
+  }
+}

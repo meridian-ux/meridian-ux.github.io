@@ -112,6 +112,12 @@ if (specimenIds.length !== 36 || new Set(specimenIds).size !== 36 ||
   fail("expected 36 distinct, nonempty gallery examples");
 } else ok("36 distinct gallery examples emitted");
 
+console.log("== browser terminal ==");
+for (const asset of ["meridian_tui_preview.js", "meridian_tui_preview_bg.wasm", "stat.binpb", "prompt.binpb"]) {
+  const file = join(DIST, "tui-preview", asset);
+  if (!existsSync(file) || statSync(file).size === 0) fail(`browser terminal asset missing: ${asset}`);
+}
+
 console.log("== internal links ==");
 const present = new Set();
 (function walkAll(dir) {

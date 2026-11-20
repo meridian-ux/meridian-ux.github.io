@@ -119,3 +119,21 @@ node tools/gen-library-references.mjs "$tools_dir/node_modules"
 Pass `--check` as the final argument to either generator to verify that its
 checked-in snapshot matches the installed declarations. Update the quickstart pins
 and generation inputs together when changing the documented SDK version.
+
+## Browser terminal demo
+
+The Terminal guide lazy-loads xterm.js and a WASM build of Meridian’s Rust TUI.
+The build ships with stat and prompt protobuf fixtures and runs fully in the browser.
+
+The renderer source for the deployed bundle is
+[meridian@e52b3e7](https://github.com/meridian-ux/meridian/commit/e52b3e7f14dfa0025a80b49ab81a6843868b2322).
+With Rust, protoc, and that source checkout available, regenerate the static assets:
+
+```bash
+rustup target add wasm32-unknown-unknown
+cargo install wasm-bindgen-cli --version 0.2.105 --locked
+bash tools/build-tui-preview.sh /path/to/meridian
+```
+
+Commit the four outputs in `public/tui-preview/` together. GitHub Pages serves
+them directly, so a site build does not require a Rust toolchain.

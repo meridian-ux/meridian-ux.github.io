@@ -1,8 +1,10 @@
 ---
 import { Code } from "astro:components";
+import TerminalPreview from "../../components/TerminalPreview.astro";
 import Guide from "../../layouts/Guide.astro";
 ---
 <Guide title="Get started in the terminal" description="Run Meridian’s offline viewer with a protobuf descriptor or embed the renderer in a ratatui application.">
+  <TerminalPreview />
   <h2>Run the offline viewer</h2>
   <p>Install Rust with Cargo and make sure <code>protoc</code> is on your PATH. Clone the Meridian repository and run the viewer from its root with the included stat descriptor.</p>
   <Code lang="bash" wrap code={`git clone https://github.com/meridian-ux/meridian.git
