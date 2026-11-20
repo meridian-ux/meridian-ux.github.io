@@ -34,6 +34,17 @@ if invalid := set(wanted) - set(ids):
 print(" ".join(wanted))
 PY
 )"
+if [[ " $fixtures " == *" table "* ]]; then
+  node --experimental-strip-types --input-type=module - "$source_dir" "$staging" <<'JS'
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+
+const [source, output] = process.argv.slice(2);
+const { POPULATED_RESPONSES } = await import(pathToFileURL(join(source, "schemas/conformance/populated.ts")));
+writeFileSync(join(output, "table.json"), JSON.stringify(POPULATED_RESPONSES.table));
+JS
+fi
 (cd "$source_dir" && MERIDIAN_CAPTURE_OUTPUT="$staging" MERIDIAN_CAPTURE_FIXTURES="$fixtures" \
     swift test --filter GalleryCaptureTests/testExportNativePanels)
 for id in $fixtures; do

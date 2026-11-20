@@ -1,5 +1,7 @@
 import AppKit
+import SwiftProtobuf
 import SwiftUI
+import Vision
 import XCTest
 import MeridianUI
 
@@ -22,7 +24,23 @@ final class GalleryCaptureTests: XCTestCase {
 
         for (name, panel) in fixtures {
             let id = URL(fileURLWithPath: name).deletingPathExtension().lastPathComponent
-            let content = MeridianPanel(panel, host: MeridianHost())
+            let recordingPath = directory.appendingPathComponent(id + ".json")
+            let recording: Google_Protobuf_Value?
+            if FileManager.default.fileExists(atPath: recordingPath.path) {
+                recording = try Google_Protobuf_Value(jsonUTF8Data: Data(contentsOf: recordingPath))
+            } else {
+                recording = .none
+            }
+            var didReplay = false
+            let rpc = recording.map { response in
+                MeridianRpcCapability(admit: { call, _ in
+                    call == panel.table.populate ? .allow : .deny("")
+                }, invoke: { _, _ in
+                    didReplay = true
+                    return response
+                })
+            }
+            let content = MeridianPanel(panel, host: MeridianHost(rpc: rpc))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .padding(24)
                 .frame(width: size.width, height: size.height)
@@ -41,6 +59,10 @@ final class GalleryCaptureTests: XCTestCase {
             host.frame = NSRect(origin: .zero, size: size)
             host.layoutSubtreeIfNeeded()
             window.displayIfNeeded()
+            if recording != nil {
+                window.setFrameOrigin(NSPoint(x: -10_000, y: -10_000))
+                window.orderBack(nil)
+            }
 
             let bitmap = try XCTUnwrap(NSBitmapImageRep(
                 bitmapDataPlanes: nil, pixelsWide: 1280, pixelsHigh: 960,
@@ -48,7 +70,26 @@ final class GalleryCaptureTests: XCTestCase {
                 colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
             ))
             bitmap.size = size
-            host.cacheDisplay(in: host.bounds, to: bitmap)
+            if recording != nil {
+                // Repaint until SwiftUI commits the asynchronously populated rows.
+                let recognition = VNRecognizeTextRequest()
+                let deadline = ContinuousClock.now + .seconds(5)
+                var rendered = false
+                repeat {
+                    try await Task.sleep(for: .milliseconds(50))
+                    guard didReplay else { continue }
+                    host.layoutSubtreeIfNeeded()
+                    window.displayIfNeeded()
+                    host.cacheDisplay(in: host.bounds, to: bitmap)
+                    let image = try XCTUnwrap(bitmap.cgImage, id)
+                    try VNImageRequestHandler(cgImage: image).perform([recognition])
+                    let text = recognition.results?.compactMap { $0.topCandidates(1).first?.string }.joined(separator: " ") ?? ""
+                    rendered = text.contains("Ada") && text.contains("Grace")
+                } while !rendered && ContinuousClock.now < deadline
+                XCTAssertTrue(rendered, "Capture did not show both canonical Table rows.")
+            } else {
+                host.cacheDisplay(in: host.bounds, to: bitmap)
+            }
             let pixels = try XCTUnwrap(bitmap.bitmapData, id)
             let background = Int(pixels[0])
             let hasContent = stride(from: 0, to: bitmap.bytesPerRow * bitmap.pixelsHigh, by: 4)

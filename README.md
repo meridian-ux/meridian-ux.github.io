@@ -178,3 +178,5 @@ at 2× scale in light appearance. The revision in the image path ties it
 to the corresponding terminal fixture. The pinned SwiftUI view projections
 identify actual renderer placeholders. Local captures go under
 `public/captures/swiftui/<revision>/`. Pages generates its own copies.
+The Table capture replays the canonical populated response through the
+SwiftUI host and checks that the fixture rows appear before saving the PNG.
