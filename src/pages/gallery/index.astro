@@ -1,0 +1,21 @@
+---
+import Guide from "../../layouts/Guide.astro";
+import { panelExamples } from "../../lib/renderer-previews";
+---
+<Guide title="Renderer gallery" description="Explore the canonical Meridian panel fixtures in the terminal renderer.">
+  <p>Each example uses a protobuf descriptor from Meridian’s conformance suite. Open a panel to see the terminal output or run it in your browser.</p>
+  <ul class="examples">
+    {panelExamples.map(example => (
+      <li data-gallery-fixture={example.id}>
+        <a href={`/gallery/${example.id}/`}>{example.label}</a>
+        {example.coverage.tui.status === "placeholder" && <small>Placeholder</small>}
+      </li>
+    ))}
+  </ul>
+  <p><a href="/conformance/">Check renderer coverage</a></p>
+</Guide>
+<style>
+  .examples { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 0 20px; padding: 0; list-style: none; }
+  li { border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; padding: 10px 0; }
+  small { color: var(--muted); }
+</style>

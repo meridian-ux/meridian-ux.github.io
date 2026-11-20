@@ -11,3 +11,7 @@ bazel-*
 __pycache__/
 *.pyc
 .venv/
+
+# Built by tools/build-tui-preview.sh
+/public/tui-preview/
+/.meridian-source/

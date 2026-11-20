@@ -1,57 +1,61 @@
 ---
 import "@xterm/xterm/css/xterm.css";
+import { terminalPreview, type Preview } from "../lib/renderer-previews";
+const { id = "browser-preview", title = "Try it in your browser", preview } = Astro.props;
+const examples = (preview ? [preview] : [terminalPreview("stat", "Stat"), terminalPreview("workspace-prompt", "Prompt")])
+  .filter((item: Preview): item is Extract<Preview, { kind: "terminal" }> => item.kind === "terminal");
 ---
-<section class="terminal-preview" id="browser-preview" aria-labelledby="preview-title">
-  <h2 id="preview-title">Try it in your browser</h2>
-  <p>Run the same Rust renderer used by the offline viewer. The demo loads WebAssembly and runs locally in xterm.js.</p>
-  <button type="button" data-launch>Start terminal demo</button>
-  <p role="status" data-status></p>
-  <div data-demo hidden>
-    <div class="controls" aria-label="Example">
-      <button type="button" data-example="stat" aria-pressed="true">Stat</button>
-      <button type="button" data-example="prompt" aria-pressed="false">Prompt</button>
-      <button type="button" data-reset>Reset</button>
-    </div>
-    <p id="terminal-preview-help">Choose Prompt, focus the terminal, then type and press Enter. Press Escape to cancel or Tab to leave the terminal.</p>
-    <div class="terminal-screen" data-screen role="region" aria-label="Meridian terminal" aria-describedby="terminal-preview-help"></div>
-  </div>
-  <details open data-fallback>
-    <summary>Text preview</summary>
-    <p><strong>Active employees</strong> 1,240, up 60 from the previous value. The prompt asks for a workspace name and confirms submission locally.</p>
-  </details>
-  <noscript><p>Enable JavaScript to load the terminal demo.</p></noscript>
+<section class="terminal-preview" id={id} aria-labelledby={`${id}-title`}>
+  <h2 id={`${id}-title`}>{title}</h2>
+  {examples.length ? (
+    <>
+      {preview?.placeholder && <p>{preview.placeholder}</p>}
+      <button type="button" data-launch>Start terminal demo</button>
+      <p role="status" data-status></p>
+      <div data-demo hidden>
+        <div class="controls">
+          {examples.length > 1 && examples.map(item => (
+            <button type="button" data-choice={item.fixture} aria-pressed="false">{item.label}</button>
+          ))}
+          <button type="button" data-reset>Reset</button>
+        </div>
+        <p id={`${id}-help`} data-help></p>
+        <div class="terminal-screen" data-screen role="region" aria-label="Meridian terminal" aria-describedby={`${id}-help`}></div>
+      </div>
+      <details open data-fallback>
+        <summary>Text preview</summary>
+        {examples.map(item => (
+          <div data-example={item.fixture} data-label={item.label} data-recording={item.recording} data-interactive={String(item.interactive)}>
+            {examples.length > 1 && <p>{item.label}</p>}
+            <pre>{item.snapshot.trimEnd()}</pre>
+          </div>
+        ))}
+      </details>
+      <noscript><p>Enable JavaScript to load the terminal demo.</p></noscript>
+    </>
+  ) : <p>The terminal preview assets are unavailable in this build.</p>}
 </section>
 
 <script>
-  const root = document.querySelector<HTMLElement>(".terminal-preview");
-  if (root) {
-    const launch = root.querySelector<HTMLButtonElement>("[data-launch]")!;
+  for (const root of document.querySelectorAll<HTMLElement>(".terminal-preview")) {
+    const launch = root.querySelector<HTMLButtonElement>("[data-launch]");
+    if (!launch) continue;
     const status = root.querySelector<HTMLElement>("[data-status]")!;
-    const demo = root.querySelector<HTMLElement>("[data-demo]")!;
-    const screen = root.querySelector<HTMLElement>("[data-screen]")!;
     const fallback = root.querySelector<HTMLDetailsElement>("[data-fallback]")!;
-    const choices = [...root.querySelectorAll<HTMLButtonElement>("[data-example]")];
-    const reset = root.querySelector<HTMLButtonElement>("[data-reset]")!;
-
     launch.addEventListener("click", async () => {
       launch.disabled = true;
       status.textContent = "Loading the terminal demo…";
       try {
         const { mountPreview } = await import("../scripts/tui-preview");
-        await mountPreview({ screen, demo, choices, reset, status });
+        await mountPreview(root);
         fallback.open = false;
         launch.hidden = true;
       } catch {
-        recover();
+        launch.disabled = false;
+        fallback.open = true;
+        status.textContent = "The terminal demo could not load. Try again or use the text preview.";
       }
     });
-
-    function recover() {
-      demo.hidden = true;
-      launch.disabled = false;
-      status.textContent = "The terminal demo could not load. Try again or use the text preview.";
-      fallback.open = true;
-    }
   }
 </script>
 
@@ -61,8 +65,9 @@ import "@xterm/xterm/css/xterm.css";
   button[aria-pressed="true"] { border-color: var(--amber); }
   button:disabled { cursor: wait; opacity: .65; }
   .controls { display: flex; flex-wrap: wrap; gap: 8px; }
-  .terminal-screen { height: 16rem; max-inline-size: 100%; overflow: hidden; padding: 8px; background: var(--ink); border: 1px solid var(--line-2); }
+  .terminal-screen { height: 19rem; max-inline-size: 100%; overflow: hidden; padding: 8px; background: var(--ink); border: 1px solid var(--line-2); }
   .terminal-screen:focus-within { outline: 2px solid var(--amber); outline-offset: 2px; }
-  #terminal-preview-help { color: var(--muted); font-size: .9rem; }
+  [data-help] { color: var(--muted); font-size: .9rem; }
+  pre { max-inline-size: 100%; overflow: auto; padding: 8px; font: .78rem/1.5 var(--mono); }
   summary { cursor: pointer; }
 </style>

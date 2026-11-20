@@ -1,0 +1,20 @@
+---
+import Guide from "../../layouts/Guide.astro";
+import RendererPreview from "../../components/RendererPreview.astro";
+import { conformanceSource } from "../../content/conformance_source";
+import { getPreview, panelExamples, rendererChoices } from "../../lib/renderer-previews";
+export function getStaticPaths() {
+  return panelExamples.map(example => ({ params: { fixture: example.id }, props: { example } }));
+}
+const { example } = Astro.props;
+---
+<Guide title={example.label} description="Meridian panel fixture">
+  <p><a href="/gallery/">All fixtures</a> · <a href="/conformance/">Renderer coverage</a></p>
+  {rendererChoices.map(renderer => (
+    <section aria-labelledby={`renderer-${renderer.id}`}>
+      <h2 id={`renderer-${renderer.id}`}>{renderer.label}</h2>
+      <RendererPreview preview={getPreview(example.id, renderer.id)} id={`preview-${renderer.id}`} />
+    </section>
+  ))}
+  <p><a href={`https://github.com/${conformanceSource.repository}/blob/${conformanceSource.revision}/schemas/conformance/binpb/${example.id}.binpb`}>Protobuf fixture source ↗</a></p>
+</Guide>

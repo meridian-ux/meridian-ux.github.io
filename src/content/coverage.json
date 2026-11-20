@@ -40,8 +40,8 @@
       "entrypoint": "rust/tui/src/widget.rs"
     },
     "swiftui": {
-      "repo": "meridian-ui",
-      "entrypoint": "External preview; source is not available in this repository."
+      "repo": "meridian",
+      "entrypoint": "packages/swiftui/Sources/MeridianUI/MeridianPanel.swift"
     }
   },
   "modalities": {
@@ -55,6 +55,9 @@
             },
             "chat-react": {
               "status": "renders"
+            },
+            "playground": {
+              "status": "renders"
             }
           }
         },
@@ -64,6 +67,9 @@
               "status": "renders"
             },
             "chat-react": {
+              "status": "renders"
+            },
+            "playground": {
               "status": "renders"
             }
           }
@@ -75,6 +81,9 @@
             },
             "chat-react": {
               "status": "renders"
+            },
+            "playground": {
+              "status": "renders"
             }
           }
         },
@@ -84,6 +93,9 @@
               "status": "renders"
             },
             "chat-react": {
+              "status": "renders"
+            },
+            "playground": {
               "status": "renders"
             }
           }
@@ -95,6 +107,9 @@
             },
             "chat-react": {
               "status": "renders"
+            },
+            "playground": {
+              "status": "renders"
             }
           }
         },
@@ -104,6 +119,9 @@
               "status": "renders"
             },
             "chat-react": {
+              "status": "renders"
+            },
+            "playground": {
               "status": "renders"
             }
           }
@@ -115,6 +133,9 @@
             },
             "chat-react": {
               "status": "renders"
+            },
+            "playground": {
+              "status": "renders"
             }
           }
         },
@@ -125,6 +146,9 @@
             },
             "chat-react": {
               "status": "renders"
+            },
+            "playground": {
+              "status": "renders"
             }
           }
         },
@@ -132,18 +156,22 @@
           "renderers": {
             "chat-html": {
               "status": "not-applicable",
-              "reason": "The framework-free HTML tier has no host panel-renderer seam; it intentionally leaves composed ViewDescriptor blocks inert."
+              "reason": "The framework-free HTML tier has no interactive host panel-renderer seam. Its shared bounded passive text projection preserves authored composition but executes no actions or data reads; it is not interactive ViewDescriptor parity."
             },
             "chat-react": {
               "status": "separate-entrypoint",
-              "reason": "BlockView delegates the nested ViewDescriptor to the host-supplied renderView callback rather than importing a panel renderer."
+              "reason": "BlockView delegates interactive ViewDescriptor rendering to the host-supplied renderView callback. Without a callback it uses the shared bounded passive text projection, not a live panel renderer."
+            },
+            "playground": {
+              "status": "separate-entrypoint",
+              "reason": "The private development playground delegates View blocks to its transcript chip and composed canvas; its fixture gate exercises real host HTTP/SSE emission and this handoff."
             }
           }
         }
       }
     },
     "launchpad": {
-      "oneof": "Command.action",
+      "oneof": "Affordance.invoke",
       "arms": {
         "rpc": {
           "renderers": {
@@ -159,7 +187,28 @@
             }
           }
         },
-        "open_view_id": {
+        "open_view": {
+          "renderers": {
+            "launchpad": {
+              "status": "renders"
+            }
+          }
+        },
+        "uri": {
+          "renderers": {
+            "launchpad": {
+              "status": "renders"
+            }
+          }
+        },
+        "command": {
+          "renderers": {
+            "launchpad": {
+              "status": "renders"
+            }
+          }
+        },
+        "copy": {
           "renderers": {
             "launchpad": {
               "status": "renders"
@@ -200,7 +249,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -224,11 +273,11 @@
         },
         "tui": {
           "status": "renders",
-          "reason": "The TUI renders LRO inputs and run affordance text; hosts handle the long-running operation transport."
+          "reason": "The TUI renders typed inputs, host-driven progress/failure/cancellation, and finalized result tables with stale-safe runtime identities; hosts own operation transport and finalization."
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -259,7 +308,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -283,12 +332,12 @@
           "status": "renders"
         },
         "tui": {
-          "status": "separate-entrypoint",
-          "reason": "Rendered by a dedicated one-shot entrypoint (render_prompt / render_llm_prompt) rather than by PanelView's dispatch."
+          "status": "renders",
+          "reason": "PanelView owns local typed prompt input, validation, confirmation/cancellation, and canonical protobuf response collection; native hosts resolve remote enum options before rendering."
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -315,12 +364,12 @@
           "reason": "shadcnKit shares the typed parameter-fill and local textual preview implementation with htmlKit."
         },
         "tui": {
-          "status": "separate-entrypoint",
-          "reason": "Rendered by a dedicated one-shot entrypoint (render_prompt / render_llm_prompt) rather than by PanelView's dispatch."
+          "status": "renders",
+          "reason": "PanelView owns typed parameter fill and local one-pass LLM preview, preserving multiline input and concealing masked display values; it never executes a provider."
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -345,11 +394,11 @@
         },
         "tui": {
           "status": "renders",
-          "reason": "The TUI renders populated gallery cards as selectable text, retaining title, subtitle, status, links, and actions."
+          "reason": "The TUI renders populated gallery cards in a width-aware selectable text grid, retaining title, subtitle, status, links, and actions."
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -373,11 +422,11 @@
         },
         "tui": {
           "status": "renders",
-          "reason": "The TUI renders form fields as labeled terminal controls with read-only and editable modes plus defaults."
+          "reason": "The TUI renders read-only/editable typed controls and bounded recursive defaults; core validation precedes host-owned request collection."
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -404,7 +453,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -432,7 +481,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -460,7 +509,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -488,7 +537,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -516,7 +565,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -544,7 +593,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -556,20 +605,20 @@
           "status": "renders"
         },
         "web-react": {
-          "status": "renders",
-          "reason": "PanelRenderer provides an accessible connection-metadata fallback when a React kit omits the specialized terminal component."
+          "reason": "Interactive PTY support is web-components-specific per terminal.proto. React dispatches an optional Terminal slot or the host kit's Fallback; connection metadata is degradation, not interactive PTY support.",
+          "status": "not-applicable"
         },
         "mui-kit": {
-          "status": "renders",
-          "reason": "The MUI kit renders an accessible terminal connection fallback with tool, URL, and dimensions."
+          "reason": "Interactive PTY support is web-components-specific per terminal.proto. The MUI kit preserves accessible connection metadata as a fallback, not an interactive PTY.",
+          "status": "not-applicable"
         },
         "html-kit": {
-          "status": "renders",
-          "reason": "The HTML kit renders an accessible terminal connection fallback with tool, URL, and dimensions."
+          "reason": "Interactive PTY support is web-components-specific per terminal.proto. The HTML kit preserves accessible connection metadata as a fallback, not an interactive PTY.",
+          "status": "not-applicable"
         },
         "shadcn-kit": {
-          "status": "renders",
-          "reason": "The shadcn kit renders an accessible terminal connection fallback with tool, URL, and dimensions."
+          "reason": "Interactive PTY support is web-components-specific per terminal.proto. The shadcn kit preserves accessible connection metadata as a fallback, not an interactive PTY.",
+          "status": "not-applicable"
         },
         "tui": {
           "status": "placeholder",
@@ -577,7 +626,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -604,7 +653,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -631,7 +680,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -662,7 +711,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -692,7 +741,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -721,7 +770,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -751,7 +800,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -782,7 +831,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }
@@ -814,7 +863,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository."
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate."
         }
       }
     },
@@ -841,7 +890,7 @@
         },
         "swiftui": {
           "status": "unverified",
-          "reason": "The SwiftUI renderer is an external preview; its behavior has not been verified in this repository.",
+          "reason": "The local SwiftUI preview has not yet passed the full native semantic conformance gate.",
           "waiver": "External preview parity has not been verified here; retain the waiver until its owner supplies evidence."
         }
       }

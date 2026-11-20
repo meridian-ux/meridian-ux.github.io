@@ -120,20 +120,30 @@ Pass `--check` as the final argument to either generator to verify that its
 checked-in snapshot matches the installed declarations. Update the quickstart pins
 and generation inputs together when changing the documented SDK version.
 
-## Browser terminal demo
+## Renderer gallery
 
-The Terminal guide lazy-loads xterm.js and a WASM build of Meridian’s Rust TUI.
-The build ships with stat and prompt protobuf fixtures and runs fully in the browser.
+GitHub Pages checks out the immutable Meridian revision in
+`tools/meridian-revision.txt`. It uses that checkout for the WASM renderer,
+the conformance table, and the protobuf fixtures. Before Astro builds, the
+gallery preparer exercises every fixture at two widths and writes both the
+browser assets and the text fallbacks. Generated files under
+`public/tui-preview/` are build outputs.
 
-The renderer source for the deployed bundle is
-[meridian@e52b3e7](https://github.com/meridian-ux/meridian/commit/e52b3e7f14dfa0025a80b49ab81a6843868b2322).
-With Rust, protoc, and that source checkout available, regenerate the static assets:
+To build the same gallery locally, install Node.js 22, pnpm, protoc, Rust
+1.95.0, and wasm-bindgen CLI 0.2.105. Check out the pinned revision in a separate
+Meridian checkout, then run from this repository:
 
 ```bash
-rustup target add wasm32-unknown-unknown
+pnpm install --frozen-lockfile
+rustup target add --toolchain 1.95.0 wasm32-unknown-unknown
 cargo install wasm-bindgen-cli --version 0.2.105 --locked
-bash tools/build-tui-preview.sh /path/to/meridian
+RUSTUP_TOOLCHAIN=1.95.0 bash tools/build-tui-preview.sh /path/to/meridian
+node tools/sync_conformance.mjs --revision "$(cat tools/meridian-revision.txt)" \
+  --manifest /path/to/meridian/schemas/conformance/coverage.json
+pnpm build
+MERIDIAN_REQUIRE_TUI_ASSETS=1 node tools/smoke_test.mjs
 ```
 
-Commit the four outputs in `public/tui-preview/` together. GitHub Pages serves
-them directly, so a site build does not require a Rust toolchain.
+Each example has a stable fixture ID and a shared preview component. The
+renderer registry can select an interactive terminal, an image capture, or
+a placeholder, so a future native capture can use the same fixture pages.

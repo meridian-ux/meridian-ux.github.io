@@ -35,9 +35,15 @@ for (let at = bytes.indexOf(prefix); at !== -1; at = bytes.indexOf(prefix, at + 
 if (!WebAssembly.validate(bytes)) throw new Error("Invalid browser terminal WASM.");
 writeFileSync(file, bytes);
 JS
-cp schemas/conformance/binpb/stat.binpb "$staging/stat.binpb"
 protoc -I schemas -I third_party/googleapis --encode=meridian.ui.v1.PanelDescriptor proto/panel.proto \
-  < "$site_dir/src/examples/tui-preview/prompt.textproto" > "$staging/prompt.binpb"
+  < "$site_dir/src/examples/tui-preview/prompt.textproto" > "$staging/workspace-prompt.binpb"
 
+# Node loads wasm-bindgen's ESM adapter from the temporary directory.
+echo '{"type":"module"}' > "$staging/package.json"
+node --experimental-strip-types "$site_dir/tools/prepare-tui-gallery.mjs" "$meridian_dir" "$staging"
 mkdir -p "$output"
-cp "$staging"/{meridian_tui_preview.js,meridian_tui_preview_bg.wasm,stat.binpb,prompt.binpb} "$output/"
+cp "$staging"/{meridian_tui_preview.js,meridian_tui_preview_bg.wasm} "$output/"
+for directory in fixtures recordings snapshots; do
+  rm -rf "$output/$directory"
+  cp -R "$staging/$directory" "$output/$directory"
+done

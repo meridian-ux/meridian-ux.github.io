@@ -21,5 +21,8 @@
       "esbuild",
       "sharp"
     ]
+  },
+  "devDependencies": {
+    "@bufbuild/protobuf": "2.12.1"
   }
 }

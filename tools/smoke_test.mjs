@@ -71,7 +71,7 @@ const features = catalog
 if (!catalog) fail("src/content/features.json not found — cannot derive feature routes");
 else if (features.length === 0) fail("features.json lists no features — the catalog is empty");
 
-const ROUTES = ["", "features", "conformance", "brand", "start", "start/web", "start/web/react", "start/swiftui", "start/terminal", "start/wasm", ...features.map((f) => `features/${f.slug}`)];
+const ROUTES = ["", "features", "conformance", "brand", "gallery", "start", "start/web", "start/web/react", "start/swiftui", "start/terminal", "start/wasm", ...features.map((f) => `features/${f.slug}`)];
 const before = fails;
 for (const r of ROUTES) {
   const f = join(DIST, r, "index.html");
@@ -112,10 +112,29 @@ if (specimenIds.length !== 36 || new Set(specimenIds).size !== 36 ||
   fail("expected 36 distinct, nonempty gallery examples");
 } else ok("36 distinct gallery examples emitted");
 
-console.log("== browser terminal ==");
-for (const asset of ["meridian_tui_preview.js", "meridian_tui_preview_bg.wasm", "stat.binpb", "prompt.binpb"]) {
-  const file = join(DIST, "tui-preview", asset);
-  if (!existsSync(file) || statSync(file).size === 0) fail(`browser terminal asset missing: ${asset}`);
+console.log("== renderer gallery ==");
+if (coverageFile && existsSync(join(DIST, "gallery/index.html"))) {
+  const coverage = JSON.parse(readFileSync(coverageFile, "utf8"));
+  const index = readFileSync(join(DIST, "gallery/index.html"), "utf8");
+  const ids = [...index.matchAll(/data-gallery-fixture="([^"]+)"/g)].map(([, id]) => id);
+  if (JSON.stringify(ids) !== JSON.stringify(Object.keys(coverage.arms))) fail("gallery does not match canonical panel coverage");
+  const requireAssets = process.env.MERIDIAN_REQUIRE_TUI_ASSETS === "1";
+  const assets = ["meridian_tui_preview.js", "meridian_tui_preview_bg.wasm"];
+  const inputs = [...ids, "workspace-prompt"];
+  for (const id of ids) {
+    const page = join(DIST, "gallery", id, "index.html");
+    if (!existsSync(page)) fail(`missing fixture route: ${id}`);
+    else if (requireAssets && !readFileSync(page, "utf8").includes(`data-example="${id}"`)) fail(`missing fixture player: ${id}`);
+  }
+  if (requireAssets) {
+    for (const id of inputs) assets.push(`fixtures/${id}.binpb`, `snapshots/${id}.txt`);
+    for (const id of ["table", "gallery", "resource_cards"]) assets.push(`recordings/${id}.binpb`);
+    for (const asset of assets) {
+      const file = join(DIST, "tui-preview", asset);
+      if (!existsSync(file) || !statSync(file).size) fail(`browser terminal asset missing: ${asset}`);
+    }
+  }
+  ok(`${ids.length} canonical panel routes checked`);
 }
 
 console.log("== internal links ==");
