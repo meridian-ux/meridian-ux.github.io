@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Gallery from "../components/Gallery.astro";
+import Quickstart from "../components/Quickstart.astro";
 ---
 <Base title="Meridian — A design language for interfaces" description="Explore Meridian’s typed UI elements, theme foundations, and renderer coverage.">
   <header class="intro">
@@ -48,11 +49,7 @@ import Gallery from "../components/Gallery.astro";
     <a id="renderers" href="/features/">Explore the renderers →</a>
   </section>
 
-  <section class="chapter" id="start">
-    <h2>Get started</h2>
-    <p>Author a Meridian descriptor, then use a renderer to display it on the web, in SwiftUI, or in the terminal.</p>
-    <a href="/features/">Choose a renderer →</a>
-  </section>
+  <Quickstart />
 </Base>
 
 <style>

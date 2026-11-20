@@ -1,0 +1,7 @@
+{
+  "panelId": "deployments",
+  "stat": {
+    "label": "Deployments",
+    "value": 42
+  }
+}
