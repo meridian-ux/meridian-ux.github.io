@@ -22,19 +22,39 @@ final class GalleryCaptureTests: XCTestCase {
         let size = NSSize(width: 640, height: 480)
         _ = NSApplication.shared
 
-        for (name, panel) in fixtures {
+        for (name, descriptor) in fixtures {
             let id = URL(fileURLWithPath: name).deletingPathExtension().lastPathComponent
+            var panel = descriptor
             let recordingPath = directory.appendingPathComponent(id + ".json")
             let recording: Google_Protobuf_Value?
+            let read: Meridian_Ui_V1_RpcCall
+            let expectedText: [String]
             if FileManager.default.fileExists(atPath: recordingPath.path) {
                 recording = try Google_Protobuf_Value(jsonUTF8Data: Data(contentsOf: recordingPath))
+                read = panel.table.populate
+                expectedText = ["Ada", "Grace"]
+            } else if id == "form", case .form(var form) = panel.body {
+                // Seed the native editor through its read-only prefill path so
+                // the screenshot shows the nested controls and sample values.
+                var prefill = Meridian_Ui_V1_RpcCall()
+                prefill.service = "meridian.gallery.Navigation"
+                prefill.method = "Read"
+                form.prefill = prefill
+                panel.body = .form(form)
+                recording = try Google_Protobuf_Value(jsonString: """
+                    {"groups":[{"label":"Operations","kinds":["workspace"]}]}
+                    """)
+                read = prefill
+                expectedText = ["Operations", "workspace", "Add kind", "Add section"]
             } else {
                 recording = .none
+                read = .init()
+                expectedText = []
             }
             var didReplay = false
             let rpc = recording.map { response in
                 MeridianRpcCapability(admit: { call, _ in
-                    call == panel.table.populate ? .allow : .deny("")
+                    call == read ? .allow : .deny("")
                 }, invoke: { _, _ in
                     didReplay = true
                     return response
@@ -71,7 +91,7 @@ final class GalleryCaptureTests: XCTestCase {
             ))
             bitmap.size = size
             if recording != nil {
-                // Repaint until SwiftUI commits the asynchronously populated rows.
+                // Repaint until SwiftUI commits the asynchronous response.
                 let recognition = VNRecognizeTextRequest()
                 let deadline = ContinuousClock.now + .seconds(5)
                 var rendered = false
@@ -84,9 +104,9 @@ final class GalleryCaptureTests: XCTestCase {
                     let image = try XCTUnwrap(bitmap.cgImage, id)
                     try VNImageRequestHandler(cgImage: image).perform([recognition])
                     let text = recognition.results?.compactMap { $0.topCandidates(1).first?.string }.joined(separator: " ") ?? ""
-                    rendered = text.contains("Ada") && text.contains("Grace")
+                    rendered = expectedText.allSatisfy { text.localizedCaseInsensitiveContains($0) }
                 } while !rendered && ContinuousClock.now < deadline
-                XCTAssertTrue(rendered, "Capture did not show both canonical Table rows.")
+                XCTAssertTrue(rendered, "Capture did not show the recorded content for " + id)
             } else {
                 host.cacheDisplay(in: host.bounds, to: bitmap)
             }

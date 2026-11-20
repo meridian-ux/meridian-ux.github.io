@@ -180,3 +180,5 @@ identify actual renderer placeholders. Local captures go under
 `public/captures/swiftui/<revision>/`. Pages generates its own copies.
 The Table capture replays the canonical populated response through the
 SwiftUI host and checks that the fixture rows appear before saving the PNG.
+The Form capture uses the same host seam to prefill a sample navigation
+group and verifies that the nested add controls appear.
