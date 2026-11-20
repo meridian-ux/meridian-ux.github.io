@@ -1,0 +1,97 @@
+---
+const { kind } = Astro.props;
+---
+<div class="sample" data-preview={kind}>
+  {(kind === "panel.table" || kind === "conversation.table") &&
+    <table aria-label={kind === "panel.table" ? "Service inventory" : "Service summary"}>
+      <thead><tr><th scope="col">Service</th><th scope="col">Status</th></tr></thead>
+      <tbody><tr><td>Gateway</td><td>Healthy</td></tr><tr><td>Worker</td><td>Queued</td></tr></tbody>
+    </table>}
+  {kind === "panel.lro" && <label>Exporting records <progress value="72" max="100">72%</progress></label>}
+  {kind === "panel.adhoc" && <pre>{'{ "region": "us-east-1" }'}</pre>}
+  {kind === "panel.prompt" && <label>Workspace name<input placeholder="Production" /></label>}
+  {kind === "panel.llm_prompt" && <label>Ask about your data<textarea rows="2" placeholder="Summarize open incidents" /></label>}
+  {kind === "panel.gallery" && <div class="tiles" aria-label="Brand mark collection"><img src="/assets/meridian-mark.png" alt="Meridian mark" /><img src="/assets/meridian-mark-512.png" alt="Meridian mark, large format" /></div>}
+  {kind === "panel.form" && <div class="stack"><label>Host<input value="db.internal" /></label><label><input type="checkbox" checked /> Use TLS</label></div>}
+  {kind === "panel.choice" && <label>Release channel<select><option>Stable</option><option>Preview</option></select></label>}
+  {kind === "panel.snippet" && <pre><code>meridian.ui.v1.PanelDescriptor</code></pre>}
+  {kind === "panel.action" && <details><summary>Review release</summary><p>Release v1.0 is ready for review.</p></details>}
+  {kind === "panel.connect_flow" && <ol><li>Choose a provider</li><li>Authorize access</li><li>Verify connection</li></ol>}
+  {kind === "panel.copy_value" && <div class="copy-value"><label>Record ID<input value="rec_037" readonly /></label><button type="button" data-copy>Copy</button><span role="status"></span></div>}
+  {kind === "panel.catalog" && <ul class="stack"><li>Gateway · API</li><li>Worker · Compute</li><li>Archive · Storage</li></ul>}
+  {kind === "panel.terminal" && <pre><code>$ status gateway<br />gateway: healthy</code></pre>}
+  {kind === "panel.grammar" && <pre><code>query ::= field ":" value<br />field ::= "service" | "status"</code></pre>}
+  {kind === "panel.stat" && <div><strong class="metric">99.98%</strong><p>Availability · 30 days</p></div>}
+  {kind === "panel.detail_header" && <div><small>Infrastructure / Services</small><strong class="heading">Gateway</strong><p>Production · us-east-1</p></div>}
+  {kind === "panel.record_card" && <dl><dt>Owner</dt><dd>Platform</dd><dt>Updated</dt><dd>Today</dd></dl>}
+  {kind === "panel.resource_cards" && <div class="tiles"><span>Gateway<br /><small>Service</small></span><span>Archive<br /><small>Bucket</small></span></div>}
+  {kind === "panel.chart" && <div class="chart" role="img" aria-label="Deployments from Monday to Friday: 3, 5, 4, 8, 6"><div style="--height:30%"></div><div style="--height:50%"></div><div style="--height:40%"></div><div style="--height:80%"></div><div style="--height:60%"></div></div>}
+  {kind === "panel.steps" && <ol><li>✓ Build</li><li aria-current="step">Review</li><li>Deploy</li></ol>}
+  {kind === "panel.media" && <figure><img src="/assets/meridian-mark-512.png" alt="A refracted beam tracing an M" /><figcaption>Meridian identity</figcaption></figure>}
+  {kind === "panel.stream" && <pre><code>09:41 Build queued<br />09:42 Checks passed<br />09:43 Release staged</code></pre>}
+  {kind === "conversation.markdown" && <p><strong>Release ready.</strong> All checks passed for <code>v1.0</code>.</p>}
+  {kind === "conversation.context" && <p class="context">Production / Gateway</p>}
+  {kind === "conversation.tool" && <details><summary>check_status · completed</summary><p>Gateway is healthy.</p></details>}
+  {kind === "conversation.list" && <ul><li>Build passed</li><li>Review requested</li></ul>}
+  {kind === "conversation.fields" && <dl><dt>Region</dt><dd>us-east-1</dd><dt>Replicas</dt><dd>3</dd></dl>}
+  {kind === "conversation.code" && <pre><code>kubectl get deployments</code></pre>}
+  {kind === "conversation.divider" && <div><p>Build finished</p><hr /><p>Review started</p></div>}
+  {kind === "conversation.view" && <details><summary>Service health</summary><p>3 of 3 replicas are ready.</p></details>}
+  {kind === "launchpad.rpc" && <details><summary>Check service status</summary><p>RPC preview · Gateway is healthy.</p></details>}
+  {kind === "launchpad.open_panel" && <a href="#element-panel-form">Open connection form →</a>}
+  {kind === "launchpad.open_view_id" && <a href="#element-conversation-view">Open service health view →</a>}
+  {kind === "launchpad.navigate" && <a href="/features/">Go to renderers →</a>}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const field = button.parentElement?.querySelector("input");
+      const status = button.parentElement?.querySelector("[role=status]");
+      if (!field || !status) return;
+      try {
+        await navigator.clipboard.writeText(field.value);
+        status.textContent = "Copied";
+      } catch {
+        field.focus();
+        field.select();
+        status.textContent = "Copy the selected ID";
+      }
+    });
+  });
+</script>
+
+<style>
+  .copy-value { display: flex; align-items: end; gap: 6px; flex-wrap: wrap; }
+  .copy-value label { flex: 1; min-width: 85px; }
+  .copy-value button { padding: 6px 8px; border: 1px solid var(--line-2); border-radius: 3px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+  .copy-value [role="status"] { flex-basis: 100%; color: var(--muted); }
+  .copy-value [role="status"]:empty { display: none; }
+
+  .sample { min-height: 78px; color: var(--cream); font-size: .9rem; }
+  p, figure, ul, ol, pre, dl { margin: 0; }
+  pre { overflow: auto; font: .78rem/1.65 var(--mono); color: var(--muted); }
+  small, figcaption, dt { color: var(--muted); }
+  dd { margin: 0; }
+  dl { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  ul, ol { padding-inline-start: 1.2rem; }
+  .metric { font-size: 1.75rem; line-height: 1; }
+  .heading { display: block; font-size: 1.15rem; }
+  .stack { display: grid; gap: 8px; }
+  .context, .tiles > span { border: 1px solid var(--line-2); padding: 6px 8px; }
+  .tiles { display: flex; gap: 8px; }
+  img { display: block; width: 46px; height: 46px; object-fit: contain; }
+  label { display: block; }
+  input, textarea, select { font: inherit; color: inherit; background: var(--ink-2); border: 1px solid var(--line-2); border-radius: 3px; }
+  input:not([type="checkbox"]), textarea, select { display: block; width: 100%; padding: 6px; margin-top: 4px; color-scheme: dark; }
+  progress { display: block; width: 100%; accent-color: var(--amber); margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th, td { border-bottom: 1px solid var(--line); padding: 3px 6px 3px 0; }
+  th { color: var(--muted); font-weight: 500; }
+  hr { border: 0; border-top: 1px solid var(--line-2); }
+  summary { cursor: pointer; }
+  details p { margin-top: 6px; color: var(--muted); }
+  a { text-decoration: underline; text-underline-offset: .24em; }
+  .chart { display: flex; gap: 6px; align-items: end; height: 72px; border-bottom: 1px solid var(--line-2); }
+  .chart div { flex: 1; max-width: 28px; height: var(--height); background: var(--amber); }
+</style>

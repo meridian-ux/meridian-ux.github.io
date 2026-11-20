@@ -103,6 +103,15 @@ else if (existsSync(join(DIST, "conformance/index.html"))) {
   else ok(`${expected} source-derived cell statuses emitted`);
 }
 
+console.log("== gallery ==");
+const home = readFileSync(join(DIST, "index.html"), "utf8");
+const specimenIds = [...home.matchAll(/data-specimen="([^"]+)"/g)].map(([, id]) => id);
+const previews = [...home.matchAll(/data-preview="([^"]+)"[^>]*>(?!<\/div>)/g)].map(([, id]) => id);
+if (specimenIds.length !== 36 || new Set(specimenIds).size !== 36 ||
+    previews.length !== 36 || specimenIds.some((id, index) => id !== previews[index])) {
+  fail("expected 36 distinct, nonempty gallery examples");
+} else ok("36 distinct gallery examples emitted");
+
 console.log("== internal links ==");
 const present = new Set();
 (function walkAll(dir) {

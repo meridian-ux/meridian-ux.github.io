@@ -37,8 +37,6 @@ const ogUrl = new URL(ogImage, Astro.site).href;
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 </head>
 <body>
-  <div class="atmos"></div>
-  <div class="grid-atmos"></div>
   <div class="wrap">
     <Nav />
     <main id="top"><slot /></main>

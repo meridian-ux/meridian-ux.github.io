@@ -1,0 +1,47 @@
+---
+import { gallery } from "../content/gallery.mjs";
+import Specimen from "./Specimen.astro";
+
+const labels = { panel: "Panels", conversation: "Conversation blocks", launchpad: "Launchpad actions" };
+---
+<section id="primitives" class="gallery" aria-labelledby="gallery-title">
+  <h2 id="gallery-title">Elements</h2>
+  <p>Illustrative specimens of the Meridian design language. Try the controls or check support by renderer.</p>
+  <nav aria-label="Element groups">
+    {Object.entries(labels).map(([key, label]) => <a href={`#elements-${key}`}>{label} <span>{gallery[key].length}</span></a>)}
+  </nav>
+
+  {Object.entries(gallery).map(([group, names]) => (
+    <section id={`elements-${group}`} class="element-group">
+      <h3>{labels[group]}</h3>
+      <div class="specimens">
+        {names.map((name) => (
+          <article id={`element-${group}-${name}`} data-specimen={`${group}.${name}`}>
+            <h4><a href={`#element-${group}-${name}`}>{name.replaceAll("_", " ")}</a></h4>
+            <Specimen kind={`${group}.${name}`} />
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+  <a class="coverage-link" href="/conformance/">Check renderer coverage →</a>
+</section>
+
+<style>
+  .gallery { padding: 40px 0 60px; border-top: 1px solid var(--line-2); }
+  h2 { font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.05em; margin: 0; }
+  p { color: var(--muted); margin: 8px 0 18px; }
+  nav { display: flex; gap: 8px 24px; flex-wrap: wrap; }
+  nav a, .coverage-link { text-decoration: underline; text-underline-offset: .28em; }
+  nav span { font-family: var(--mono); color: var(--muted); font-size: .75rem; margin-left: 4px; }
+  .element-group { margin-top: 36px; }
+  h3 { font-size: 1.4rem; font-weight: 600; margin: 0 0 14px; }
+  .specimens { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  article { min-width: 0; padding: 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  article:target { background: var(--raise); }
+  h4 { font: .75rem var(--mono); color: var(--muted); margin: 0 0 14px; }
+  h4 a:hover { text-decoration: underline; }
+  .coverage-link { display: inline-block; margin-top: 24px; }
+  @media (max-width: 760px) { .specimens { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .specimens { grid-template-columns: minmax(0, 1fr); } }
+</style>
