@@ -84,7 +84,7 @@ exactly what it did until 2026-07-27. There is therefore **no `base`**, and link
 and assets are plain absolute paths.
 
 Every push to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
-(`withastro/action` → `actions/deploy-pages`); enable Pages with **Source =
+(Astro build → `actions/deploy-pages`); enable Pages with **Source =
 GitHub Actions**. The workflow deliberately passes no `package-manager:` input —
 `package.json` `packageManager` is the single pnpm declaration, and supplying both
 makes `pnpm/action-setup` hard-error on the duplicate.
@@ -150,6 +150,12 @@ a placeholder, so a future native capture can use the same fixture pages.
 
 ### SwiftUI captures on macOS
 
+The Pages workflow runs the capture on a GitHub-hosted macOS runner and passes
+the resulting PNGs to the Astro build as an artifact. It reuses cached captures
+for the same Meridian revision and capture code. Update
+`tools/meridian-revision.txt` when the renderer or upstream fixtures change.
+The Pages build verifies that every fixture embeds its corresponding PNG.
+
 Use a clean Meridian checkout at the revision in
 `tools/meridian-revision.txt`. Prepare its Swift package using Node.js 22, the
 repository’s pinned pnpm, Xcode 26.2 or later, and stable Rust.
@@ -170,5 +176,5 @@ The capture runs a temporary XCTest from the existing fixture harness and
 removes it afterward. It draws each panel in a 640 × 480 point AppKit host
 at 2× scale in light appearance. The revision in the image path ties it
 to the corresponding terminal fixture. The pinned SwiftUI view projections
-identify actual renderer placeholders. Commit the PNGs under
-`public/captures/swiftui/<revision>/` to publish them through Astro.
+identify actual renderer placeholders. Local captures go under
+`public/captures/swiftui/<revision>/`. Pages generates its own copies.

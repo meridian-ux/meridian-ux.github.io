@@ -119,12 +119,33 @@ if (coverageFile && existsSync(join(DIST, "gallery/index.html"))) {
   const ids = [...index.matchAll(/data-gallery-fixture="([^"]+)"/g)].map(([, id]) => id);
   if (JSON.stringify(ids) !== JSON.stringify(Object.keys(coverage.arms))) fail("gallery does not match canonical panel coverage");
   const requireAssets = process.env.MERIDIAN_REQUIRE_TUI_ASSETS === "1";
+  const requireSwiftUI = process.env.MERIDIAN_REQUIRE_SWIFTUI_ASSETS === "1";
+  const revision = process.env.MERIDIAN_REVISION;
+  if (requireSwiftUI && !/^[a-f0-9]{40}$/.test(revision ?? "")) fail("missing SwiftUI source revision");
   const assets = ["meridian_tui_preview.js", "meridian_tui_preview_bg.wasm"];
   const inputs = [...ids, "workspace-prompt"];
   for (const id of ids) {
     const page = join(DIST, "gallery", id, "index.html");
-    if (!existsSync(page)) fail(`missing fixture route: ${id}`);
-    else if (requireAssets && !readFileSync(page, "utf8").includes(`data-example="${id}"`)) fail(`missing fixture player: ${id}`);
+    if (!existsSync(page)) {
+      fail(`missing fixture route: ${id}`);
+      continue;
+    }
+    const html = readFileSync(page, "utf8");
+    if (requireAssets && !html.includes(`data-example="${id}"`)) fail(`missing fixture player: ${id}`);
+    if (requireSwiftUI) {
+      const prefix = `captures/swiftui/${revision}/${id}`;
+      const images = [`${prefix}.png`, `${prefix}.placeholder.png`]
+        .filter(path => existsSync(join(DIST, path)));
+      if (images.length !== 1 || !html.includes(`src="/${images[0]}"`)) {
+        fail(`expected one SwiftUI image embedded for ${id}`);
+        continue;
+      }
+      const png = readFileSync(join(DIST, images[0]));
+      if (png.length < 24 || png.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a" ||
+          png.readUInt32BE(16) !== 1280 || png.readUInt32BE(20) !== 960) {
+        fail(`invalid SwiftUI capture: ${images[0]}`);
+      }
+    }
   }
   if (requireAssets) {
     for (const id of inputs) assets.push(`fixtures/${id}.binpb`, `snapshots/${id}.txt`);

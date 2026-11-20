@@ -13,11 +13,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-24.04
+  swiftui:
+    runs-on: macos-26
+    timeout-minutes: 60
     env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
       RUSTUP_TOOLCHAIN: "1.95.0"
-      WASM_BINDGEN_VERSION: "0.2.105"
+    outputs:
+      revision: ${{ steps.source.outputs.revision }}
     steps:
       - uses: actions/checkout@v4
       - name: Read the Meridian source pin
@@ -26,10 +29,65 @@ jobs:
           revision=$(cat tools/meridian-revision.txt)
           [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
           echo "revision=$revision" >> "$GITHUB_OUTPUT"
+          # Keep the checked-in local previews out of the CI cache and artifact.
+          rm -rf public/captures/swiftui
+      - uses: actions/cache@v4
+        id: captures
+        with:
+          path: public/captures/swiftui/${{ steps.source.outputs.revision }}
+          key: swiftui-${{ runner.os }}-${{ runner.arch }}-xcode-26.2-rust-${{ env.RUSTUP_TOOLCHAIN }}-${{ steps.source.outputs.revision }}-${{ hashFiles('tools/capture-swiftui.sh', 'tools/GalleryCaptureTests.swift', '.github/workflows/deploy.yml') }}
       - uses: actions/checkout@v4
+        if: steps.captures.outputs.cache-hit != 'true'
         with:
           repository: meridian-ux/meridian
           ref: ${{ steps.source.outputs.revision }}
+          path: .meridian-source
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        if: steps.captures.outputs.cache-hit != 'true'
+        with:
+          package_json_file: .meridian-source/package.json
+      - uses: actions/setup-node@v4
+        if: steps.captures.outputs.cache-hit != 'true'
+        with:
+          node-version: "22"
+      - name: Prepare the SwiftUI package
+        if: steps.captures.outputs.cache-hit != 'true'
+        working-directory: .meridian-source
+        run: |
+          xcodebuild -version
+          rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal \
+            --target aarch64-apple-darwin,x86_64-apple-darwin,aarch64-apple-ios,aarch64-apple-ios-sim,x86_64-apple-ios
+          pnpm install --frozen-lockfile --ignore-scripts
+          python3 tools/swiftui.py --generate-only
+      - name: Capture every SwiftUI fixture
+        if: steps.captures.outputs.cache-hit != 'true'
+        run: bash tools/capture-swiftui.sh .meridian-source
+      - uses: actions/upload-artifact@v4
+        with:
+          name: swiftui-captures
+          path: public/captures/swiftui/${{ steps.source.outputs.revision }}
+          if-no-files-found: error
+
+  build:
+    needs: swiftui
+    runs-on: ubuntu-24.04
+    env:
+      RUSTUP_TOOLCHAIN: "1.95.0"
+      WASM_BINDGEN_VERSION: "0.2.105"
+      MERIDIAN_REVISION: ${{ needs.swiftui.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove checked-in SwiftUI previews from the Pages build
+        run: rm -rf public/captures/swiftui
+      - uses: actions/download-artifact@v4
+        with:
+          name: swiftui-captures
+          path: public/captures/swiftui/${{ env.MERIDIAN_REVISION }}
+      - uses: actions/checkout@v4
+        with:
+          repository: meridian-ux/meridian
+          ref: ${{ env.MERIDIAN_REVISION }}
           path: .meridian-source
           persist-credentials: false
       - uses: pnpm/action-setup@v4
@@ -49,7 +107,7 @@ jobs:
             ~/.cargo/registry
             .meridian-source/target
             ~/.cache/meridian-wasm-tools
-          key: tui-${{ runner.os }}-${{ runner.arch }}-${{ env.RUSTUP_TOOLCHAIN }}-${{ env.WASM_BINDGEN_VERSION }}-${{ steps.source.outputs.revision }}
+          key: tui-${{ runner.os }}-${{ runner.arch }}-${{ env.RUSTUP_TOOLCHAIN }}-${{ env.WASM_BINDGEN_VERSION }}-${{ env.MERIDIAN_REVISION }}
       - name: Build and exercise all TUI previews
         run: |
           tool_dir="$HOME/.cache/meridian-wasm-tools"
@@ -58,8 +116,6 @@ jobs:
           fi
           PATH="$tool_dir/bin:$PATH" bash tools/build-tui-preview.sh .meridian-source
       - name: Import conformance from the preview source
-        env:
-          MERIDIAN_REVISION: ${{ steps.source.outputs.revision }}
         run: |
           node tools/sync_conformance.mjs --revision "$MERIDIAN_REVISION" --manifest .meridian-source/schemas/conformance/coverage.json
           node --test tools/sync_conformance.test.mjs
@@ -67,7 +123,7 @@ jobs:
         env:
           ASTRO_TELEMETRY_DISABLED: "1"
       - name: Verify routes, coverage, and gallery assets
-        run: MERIDIAN_REQUIRE_TUI_ASSETS=1 node tools/smoke_test.mjs
+        run: MERIDIAN_REQUIRE_TUI_ASSETS=1 MERIDIAN_REQUIRE_SWIFTUI_ASSETS=1 node tools/smoke_test.mjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
