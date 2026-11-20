@@ -1,0 +1,1182 @@
+[
+  {
+    "slug": "chat",
+    "title": "Chat",
+    "package": "@savvifi/meridian-chat",
+    "version": "0.25.1",
+    "entrypoints": [
+      {
+        "specifier": "@savvifi/meridian-chat",
+        "exports": [
+          {
+            "name": "Block",
+            "description": "",
+            "signature": "interface Block {\n    blockId?: string;\n    role?: Role;\n    markdown?: Markdown;\n    context?: ContextLine;\n    tool?: ToolBlock;\n    list?: ListBlock;\n    fields?: Fields;\n    code?: Code;\n    divider?: Record<string, never>;\n    table?: TableBlock;\n    view?: ViewBlock;\n}"
+          },
+          {
+            "name": "BlockView",
+            "description": "",
+            "signature": "function BlockView({ block, renderView, }: {\n    block: Block;\n    renderView?: ViewRenderer;\n}): ReactNode;"
+          },
+          {
+            "name": "Code",
+            "description": "",
+            "signature": "interface Code {\n    language?: string;\n    text?: string;\n}"
+          },
+          {
+            "name": "ContextLine",
+            "description": "",
+            "signature": "interface ContextLine {\n    icon?: string;\n    text?: string;\n}"
+          },
+          {
+            "name": "Conversation",
+            "description": "",
+            "signature": "function Conversation({ sseUrl, turnUrl, className, emptyState, placeholder, renderView, initialMessage, }: ConversationProps): ReactNode;"
+          },
+          {
+            "name": "CONVERSATION_CSS",
+            "description": "The same styles, re-scoped for the React <Conversation> wrapper.",
+            "signature": "const CONVERSATION_CSS: string;"
+          },
+          {
+            "name": "ConversationEvent",
+            "description": "One event in the answer stream (SSE, one per `data:` frame).",
+            "signature": "interface ConversationEvent {\n    seq?: number | string;\n    block?: Block;\n    status?: Status;\n    done?: TurnDone;\n    error?: TurnError;\n}"
+          },
+          {
+            "name": "ConversationModel",
+            "description": "",
+            "signature": "class ConversationModel {\n    private order;\n    private byId;\n    private seen;\n    private status;\n    private error;\n    /**\n     * Apply one event. Returns true if it changed state, false if it was a\n     * duplicate (already-seen seq) and was ignored.\n     */\n    ingest(ev: ConversationEvent): boolean;\n    /** Blocks in arrival order (each the latest version for its blockId). */\n    get blocks(): Block[];\n    /** The current live status, or null when idle/cleared. */\n    get status_(): Status | null;\n    /** The last turn error, or null. */\n    get error_(): string | null;\n    reset(): void;\n}"
+          },
+          {
+            "name": "ConversationProps",
+            "description": "",
+            "signature": "interface ConversationProps {\n    /** SSE endpoint of ConversationEvent frames. Default `/api/noc-agent/view`. */\n    sseUrl?: string;\n    /** POST endpoint for a turn ({ message }). Default `/api/noc-agent/turn`. */\n    turnUrl?: string;\n    /** Extra class on the wrapper. */\n    className?: string;\n    /** Shown before the first block arrives. */\n    emptyState?: ReactNode;\n    /**\n     * Composer placeholder. Defaults to a product-neutral string.\n     *\n     * This used to be hardcoded to one product's wording, which shipped that\n     * product's branding verbatim into every host that embedded the component —\n     * a host could only correct it by reaching into the DOM after mount and\n     * reassigning `input.placeholder`, which is what a Next.js host actually did.\n     */\n    placeholder?: string;\n    /**\n     * Draw a `view` block — composed UI an agent emitted as a ViewDescriptor.\n     *\n     * Optional, and omitting it is safe: a view block then renders as nothing,\n     * exactly as any unrecognized block kind already does. A host that wants these\n     * wires a meridian panel renderer up here (see the README) — this package will\n     * not pull one in, because a chat transcript should not drag a component\n     * library into a host that only wants text.\n     */\n    renderView?: ViewRenderer;\n    /**\n     * Send this message once, on mount, as if the user had typed it.\n     *\n     * Lets a host deep-link a conversation (`?q=…`) so a demo or a bug report is a\n     * URL rather than a sentence to retype — and so a headless browser can drive a\n     * whole turn. Sent once per mount; changing it later does not re-send, because\n     * a prop change should not silently spend a turn.\n     */\n    initialMessage?: string;\n}"
+          },
+          {
+            "name": "Field",
+            "description": "",
+            "signature": "interface Field {\n    key?: string;\n    value?: string;\n}"
+          },
+          {
+            "name": "Fields",
+            "description": "",
+            "signature": "interface Fields {\n    fields?: Field[];\n}"
+          },
+          {
+            "name": "isActiveStatus",
+            "description": "Whether a status is a live (shown) indicator vs cleared/idle.",
+            "signature": "function isActiveStatus(state: StatusState | undefined): boolean;"
+          },
+          {
+            "name": "ListBlock",
+            "description": "",
+            "signature": "interface ListBlock {\n    title?: string;\n    items?: ListItem[];\n}"
+          },
+          {
+            "name": "ListItem",
+            "description": "",
+            "signature": "interface ListItem {\n    title?: string;\n    subtitle?: string;\n    badges?: string[];\n    icon?: string;\n}"
+          },
+          {
+            "name": "Markdown",
+            "description": "",
+            "signature": "interface Markdown {\n    text?: string;\n}"
+          },
+          {
+            "name": "Role",
+            "description": "",
+            "signature": "type Role = \"user\" | \"assistant\";"
+          },
+          {
+            "name": "Status",
+            "description": "",
+            "signature": "interface Status {\n    state?: StatusState;\n    detail?: string;\n}"
+          },
+          {
+            "name": "StatusState",
+            "description": "",
+            "signature": "type StatusState = \"STATE_UNSPECIFIED\" | \"IDLE\" | \"THINKING\" | \"WORKING\";"
+          },
+          {
+            "name": "TableBlock",
+            "description": "",
+            "signature": "interface TableBlock {\n    title?: string;\n    columns?: TableColumn[];\n    rows?: TableRow[];\n}"
+          },
+          {
+            "name": "TableColumn",
+            "description": "",
+            "signature": "interface TableColumn {\n    key?: string;\n    label?: string;\n}"
+          },
+          {
+            "name": "TableRow",
+            "description": "",
+            "signature": "interface TableRow {\n    cells?: Record<string, string>;\n}"
+          },
+          {
+            "name": "ToolBlock",
+            "description": "",
+            "signature": "interface ToolBlock {\n    name?: string;\n    argsJson?: string;\n    state?: ToolState;\n    summary?: string;\n}"
+          },
+          {
+            "name": "ToolState",
+            "description": "",
+            "signature": "type ToolState = \"RUNNING\" | \"OK\" | \"ERROR\";"
+          },
+          {
+            "name": "TurnDone",
+            "description": "",
+            "signature": "interface TurnDone {\n    stopReason?: string;\n}"
+          },
+          {
+            "name": "TurnError",
+            "description": "",
+            "signature": "interface TurnError {\n    message?: string;\n}"
+          },
+          {
+            "name": "TurnRequest",
+            "description": "POST /turn body.",
+            "signature": "interface TurnRequest {\n    message: string;\n    conversationId?: string;\n}"
+          },
+          {
+            "name": "ViewBlock",
+            "description": "A composed-UI block: `meridian.ui.v1.ViewDescriptor` as proto3-JSON.\n\nDeliberately OPAQUE. Typing this as the generated `ViewDescriptor` would put\n`@savvifi/meridian-proto-ts` in this package's public `.d.ts`, turning a\ndev-only dependency into a real one — and this package's whole point is that a\nhost can drop it in with no protobuf runtime. Worse, protobuf-es types are\nNOMINAL, so a host resolving a different proto-ts minor than this package\ndeclared would find two mutually unassignable `ViewDescriptor`s and nothing\nwould typecheck. That has shipped here before.\n\nSo the descriptor passes through untyped and the HOST decodes it, against\nwhichever single proto-ts copy it actually resolves — see `renderView`.",
+            "signature": "type ViewBlock = Record<string, unknown>;"
+          },
+          {
+            "name": "ViewRenderer",
+            "description": "Draws a `view` block's ViewDescriptor. Supplied by the HOST, because drawing\none needs a full panel renderer (`@savvifi/meridian-web-react` + a ComponentKit)\nand this package stays dependency-free — a chat transcript should not drag a\ncomponent library into a host that only wants text.\n\nThe descriptor arrives as opaque proto3-JSON; the host decodes it against its\nown single copy of the generated types. See `ViewBlock`.",
+            "signature": "type ViewRenderer = (view: ViewBlock, block: Block) => ReactNode;"
+          }
+        ]
+      },
+      {
+        "specifier": "@savvifi/meridian-chat/web",
+        "exports": [
+          {
+            "name": "ASSISTANT_PANEL_CSS",
+            "description": "",
+            "signature": "const ASSISTANT_PANEL_CSS = \"\\n  m-assistant-panel { display: flex; flex-direction: column; height: 100%; min-height: 0;\\n    color: var(--text, #e5e7eb); font: 13px/1.5 system-ui, sans-serif; }\\n  m-assistant-panel .asst-log { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 20px;\\n    display: flex; flex-direction: column; gap: 12px; }\\n  m-assistant-panel .asst-row { display: flex; }\\n  m-assistant-panel .asst-row.user { justify-content: flex-end; }\\n  m-assistant-panel .asst-row > * { max-width: 82%; }\\n\\n  /* markdown bubbles */\\n  m-assistant-panel .md { padding: 8px 12px; border-radius: 12px; white-space: pre-wrap; word-break: break-word; }\\n  m-assistant-panel .asst-row.user .md { background: var(--accent, #6366f1); color: #fff; border-bottom-right-radius: 3px; }\\n  m-assistant-panel .asst-row.assistant .md { background: var(--surface-raised, color-mix(in srgb, var(--surface, #1a1d27) 70%, #080910)); border-bottom-left-radius: 3px; }\\n  m-assistant-panel .md code { font-family: ui-monospace, Menlo, monospace; font-size: 12px;\\n    background: var(--code-bg, rgba(255,255,255,0.08)); padding: 1px 4px; border-radius: 4px; }\\n\\n  /* tool card */\\n  m-assistant-panel .tool { display: flex; align-items: center; gap: 8px; font: 12px/1.4 ui-monospace, Menlo, monospace;\\n    padding: 6px 10px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--accent, #6366f1) 28%, transparent);\\n    background: color-mix(in srgb, var(--accent, #6366f1) 8%, transparent); color: var(--muted, #9ca3af); }\\n  m-assistant-panel .tool .tname { color: var(--text, #e5e7eb); }\\n  m-assistant-panel .tool .targs { opacity: 0.7; }\\n  m-assistant-panel .tool.err { border-color: color-mix(in srgb, #ef4444 45%, transparent); background: color-mix(in srgb, #ef4444 10%, transparent); color: #fca5a5; }\\n  m-assistant-panel .tool .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }\\n  m-assistant-panel .tool .dot.ok { background: #22c55e; }\\n  m-assistant-panel .tool .dot.err { background: #ef4444; }\\n  m-assistant-panel .spin { width: 10px; height: 10px; flex: none; border-radius: 50%;\\n    border: 2px solid color-mix(in srgb, var(--accent, #6366f1) 30%, transparent); border-top-color: var(--accent, #6366f1);\\n    animation: masp-spin 0.7s linear infinite; }\\n  @keyframes masp-spin { to { transform: rotate(360deg); } }\\n\\n  /* list */\\n  m-assistant-panel .list { width: 100%; border: 1px solid var(--border, color-mix(in srgb, var(--surface, #1a1d27) 55%, #fff)); border-radius: 10px; overflow: hidden; }\\n  m-assistant-panel .list .lhead { padding: 8px 12px; font-weight: 600; font-size: 12px; letter-spacing: .02em;\\n    background: var(--surface-head, color-mix(in srgb, var(--surface, #1a1d27) 65%, #080910)); border-bottom: 1px solid var(--border, color-mix(in srgb, var(--surface, #1a1d27) 55%, #fff)); }\\n  m-assistant-panel .list .litem { display: flex; align-items: baseline; gap: 8px; padding: 6px 12px; }\\n  m-assistant-panel .list .litem + .litem { border-top: 1px solid var(--border-inset, color-mix(in srgb, var(--surface, #1a1d27) 45%, #000)); }\\n  m-assistant-panel .list .ltitle { font-weight: 500; }\\n  m-assistant-panel .list .lsub { color: var(--muted, #9ca3af); font-size: 12px; }\\n  m-assistant-panel .list .lbadges { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }\\n  m-assistant-panel .badge { font-size: 11px; padding: 1px 6px; border-radius: 10px;\\n    background: color-mix(in srgb, var(--accent, #6366f1) 16%, transparent); color: color-mix(in srgb, var(--text, #e5e7eb) 85%, var(--accent)); }\\n\\n  /* fields / code / context / divider */\\n  m-assistant-panel .fields { display: grid; grid-template-columns: max-content 1fr; gap: 2px 14px; padding: 8px 12px;\\n    border: 1px solid var(--border, color-mix(in srgb, var(--surface, #1a1d27) 55%, #fff)); border-radius: 10px; }\\n  m-assistant-panel .fields .k { color: var(--muted, #9ca3af); }\\n  m-assistant-panel pre.code { width: 100%; overflow: auto; padding: 10px 12px; border-radius: 10px; margin: 0;\\n    background: #0b0d14; font: 12px/1.5 ui-monospace, Menlo, monospace; }\\n  m-assistant-panel table.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }\\n  m-assistant-panel table.tbl th, m-assistant-panel table.tbl td { text-align: left; padding: 5px 10px; border-bottom: 1px solid var(--border-inset, color-mix(in srgb, var(--surface, #1a1d27) 45%, #000)); }\\n  m-assistant-panel table.tbl th { color: var(--muted, #9ca3af); font-weight: 600; }\\n  m-assistant-panel .ctx { color: var(--muted, #9ca3af); font-size: 12px; }\\n  m-assistant-panel hr.div { width: 100%; border: none; border-top: 1px solid var(--border-divider, color-mix(in srgb, var(--surface, #1a1d27) 45%, #fff)); }\\n  m-assistant-panel .err { align-self: center; color: #fca5a5; font-size: 12px; }\\n\\n  /* status row */\\n  m-assistant-panel .status { display: none; align-items: center; gap: 8px; color: var(--muted, #9ca3af); font-size: 12px; padding: 2px; }\\n  m-assistant-panel .status.on { display: flex; }\\n  m-assistant-panel .dots span { animation: masp-blink 1.2s infinite; }\\n  m-assistant-panel .dots span:nth-child(2) { animation-delay: .2s; }\\n  m-assistant-panel .dots span:nth-child(3) { animation-delay: .4s; }\\n  @keyframes masp-blink { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }\\n\\n  /* input */\\n  m-assistant-panel form.asst-input { display: flex; gap: 8px; padding: 12px 20px;\\n    border-top: 1px solid var(--border-composer, color-mix(in srgb, var(--surface, #1a1d27) 60%, #fff)); }\\n  m-assistant-panel input.asst-text { flex: 1; padding: 8px 12px; border-radius: 8px;\\n    border: 1px solid var(--field-border, color-mix(in srgb, var(--surface, #1a1d27) 50%, #fff)); background: var(--field-bg, var(--surface, #1a1d27)); color: var(--text, #e5e7eb); font: inherit; }\\n  m-assistant-panel button.asst-send { padding: 8px 16px; border-radius: 8px; border: none; background: var(--accent, #6366f1); color: #fff; font: inherit; cursor: pointer; }\\n  m-assistant-panel button.asst-send:disabled { opacity: .5; cursor: default; }\\n\";"
+          },
+          {
+            "name": "Block",
+            "description": "",
+            "signature": "interface Block {\n    blockId?: string;\n    role?: Role;\n    markdown?: Markdown;\n    context?: ContextLine;\n    tool?: ToolBlock;\n    list?: ListBlock;\n    fields?: Fields;\n    code?: Code;\n    divider?: Record<string, never>;\n    table?: TableBlock;\n    view?: ViewBlock;\n}"
+          },
+          {
+            "name": "Code",
+            "description": "",
+            "signature": "interface Code {\n    language?: string;\n    text?: string;\n}"
+          },
+          {
+            "name": "ContextLine",
+            "description": "",
+            "signature": "interface ContextLine {\n    icon?: string;\n    text?: string;\n}"
+          },
+          {
+            "name": "ConversationEvent",
+            "description": "One event in the answer stream (SSE, one per `data:` frame).",
+            "signature": "interface ConversationEvent {\n    seq?: number | string;\n    block?: Block;\n    status?: Status;\n    done?: TurnDone;\n    error?: TurnError;\n}"
+          },
+          {
+            "name": "ConversationModel",
+            "description": "",
+            "signature": "class ConversationModel {\n    private order;\n    private byId;\n    private seen;\n    private status;\n    private error;\n    /**\n     * Apply one event. Returns true if it changed state, false if it was a\n     * duplicate (already-seen seq) and was ignored.\n     */\n    ingest(ev: ConversationEvent): boolean;\n    /** Blocks in arrival order (each the latest version for its blockId). */\n    get blocks(): Block[];\n    /** The current live status, or null when idle/cleared. */\n    get status_(): Status | null;\n    /** The last turn error, or null. */\n    get error_(): string | null;\n    reset(): void;\n}"
+          },
+          {
+            "name": "escHtml",
+            "description": "",
+            "signature": "function escHtml(value: string | number | null | undefined): string;"
+          },
+          {
+            "name": "Field",
+            "description": "",
+            "signature": "interface Field {\n    key?: string;\n    value?: string;\n}"
+          },
+          {
+            "name": "Fields",
+            "description": "",
+            "signature": "interface Fields {\n    fields?: Field[];\n}"
+          },
+          {
+            "name": "isActiveStatus",
+            "description": "Whether a status is a live (shown) indicator vs cleared/idle.",
+            "signature": "function isActiveStatus(state: StatusState | undefined): boolean;"
+          },
+          {
+            "name": "ListBlock",
+            "description": "",
+            "signature": "interface ListBlock {\n    title?: string;\n    items?: ListItem[];\n}"
+          },
+          {
+            "name": "ListItem",
+            "description": "",
+            "signature": "interface ListItem {\n    title?: string;\n    subtitle?: string;\n    badges?: string[];\n    icon?: string;\n}"
+          },
+          {
+            "name": "Markdown",
+            "description": "",
+            "signature": "interface Markdown {\n    text?: string;\n}"
+          },
+          {
+            "name": "MAssistantPanel",
+            "description": "",
+            "signature": "class MAssistantPanel extends HTMLElement {\n    private source;\n    private logEl;\n    private statusEl;\n    private inputEl;\n    private sendEl;\n    private blocks;\n    private seen;\n    static get observedAttributes(): string[];\n    get sseUrl(): string;\n    get turnUrl(): string;\n    connectedCallback(): void;\n    disconnectedCallback(): void;\n    attributeChangedCallback(name: string): void;\n    private render;\n    private connectSse;\n    private handle;\n    private upsertBlock;\n    private appendError;\n    private renderStatus;\n    private scrollDown;\n    /**\n     * Send a message. With no argument, sends the composer's current value (the\n     * form-submit path). With `text`, sets the composer to it first — the clean\n     * imperative entry point for a host driving the panel (e.g. a voice layer), an\n     * alternative to reaching into `input.asst-text` + `form.requestSubmit()`.\n     */\n    submit(text?: string): void;\n    private send;\n}"
+          },
+          {
+            "name": "mdInline",
+            "description": "Minimal inline markdown → HTML: **bold**, `code`, newlines. Escapes first.",
+            "signature": "function mdInline(text: string): string;"
+          },
+          {
+            "name": "registerAssistantPanel",
+            "description": "Idempotent registration. Call once at app start.",
+            "signature": "function registerAssistantPanel(): void;"
+          },
+          {
+            "name": "renderBlockInner",
+            "description": "",
+            "signature": "function renderBlockInner(b: Block): string;"
+          },
+          {
+            "name": "Role",
+            "description": "",
+            "signature": "type Role = \"user\" | \"assistant\";"
+          },
+          {
+            "name": "shortName",
+            "description": "",
+            "signature": "function shortName(resourceName: string | null | undefined): string;"
+          },
+          {
+            "name": "Status",
+            "description": "",
+            "signature": "interface Status {\n    state?: StatusState;\n    detail?: string;\n}"
+          },
+          {
+            "name": "StatusState",
+            "description": "",
+            "signature": "type StatusState = \"STATE_UNSPECIFIED\" | \"IDLE\" | \"THINKING\" | \"WORKING\";"
+          },
+          {
+            "name": "TableBlock",
+            "description": "",
+            "signature": "interface TableBlock {\n    title?: string;\n    columns?: TableColumn[];\n    rows?: TableRow[];\n}"
+          },
+          {
+            "name": "TableColumn",
+            "description": "",
+            "signature": "interface TableColumn {\n    key?: string;\n    label?: string;\n}"
+          },
+          {
+            "name": "TableRow",
+            "description": "",
+            "signature": "interface TableRow {\n    cells?: Record<string, string>;\n}"
+          },
+          {
+            "name": "ToolBlock",
+            "description": "",
+            "signature": "interface ToolBlock {\n    name?: string;\n    argsJson?: string;\n    state?: ToolState;\n    summary?: string;\n}"
+          },
+          {
+            "name": "ToolState",
+            "description": "",
+            "signature": "type ToolState = \"RUNNING\" | \"OK\" | \"ERROR\";"
+          },
+          {
+            "name": "TurnDone",
+            "description": "",
+            "signature": "interface TurnDone {\n    stopReason?: string;\n}"
+          },
+          {
+            "name": "TurnError",
+            "description": "",
+            "signature": "interface TurnError {\n    message?: string;\n}"
+          },
+          {
+            "name": "TurnRequest",
+            "description": "POST /turn body.",
+            "signature": "interface TurnRequest {\n    message: string;\n    conversationId?: string;\n}"
+          },
+          {
+            "name": "ViewBlock",
+            "description": "A composed-UI block: `meridian.ui.v1.ViewDescriptor` as proto3-JSON.\n\nDeliberately OPAQUE. Typing this as the generated `ViewDescriptor` would put\n`@savvifi/meridian-proto-ts` in this package's public `.d.ts`, turning a\ndev-only dependency into a real one — and this package's whole point is that a\nhost can drop it in with no protobuf runtime. Worse, protobuf-es types are\nNOMINAL, so a host resolving a different proto-ts minor than this package\ndeclared would find two mutually unassignable `ViewDescriptor`s and nothing\nwould typecheck. That has shipped here before.\n\nSo the descriptor passes through untyped and the HOST decodes it, against\nwhichever single proto-ts copy it actually resolves — see `renderView`.",
+            "signature": "type ViewBlock = Record<string, unknown>;"
+          }
+        ]
+      }
+    ],
+    "modulePatterns": []
+  },
+  {
+    "slug": "launchpad",
+    "title": "Launchpad",
+    "package": "@savvifi/meridian-launchpad",
+    "version": "0.25.1",
+    "entrypoints": [
+      {
+        "specifier": "@savvifi/meridian-launchpad",
+        "exports": [
+          {
+            "name": "commandHaystack",
+            "description": "The text a command is matched against.",
+            "signature": "function commandHaystack(command: Command): string;"
+          },
+          {
+            "name": "FilteredGroup",
+            "description": "A group header + the commands under it that survived (and are sorted by) the\ncurrent query. A lightweight view model — not a proto message — so the filter\nnever constructs descriptors (the synthetic \"Suggestions\" group has no proto\nsource).",
+            "signature": "interface FilteredGroup {\n    id: string;\n    title: string;\n    commands: Command[];\n}"
+          },
+          {
+            "name": "filterLaunchpad",
+            "description": "Filter + rank a Launchpad by `query`.\n- Empty query: every group, in declared order. If `default_command_ids` are\n  set, a synthetic leading group surfaces those first (recents / pinned).\n- Non-empty query: only matching commands, each group sorted by score, groups\n  with no matches dropped.",
+            "signature": "function filterLaunchpad(descriptor: Launchpad, query: string): FilteredGroup[];"
+          },
+          {
+            "name": "flatten",
+            "description": "Flatten the filtered groups into the keyboard-navigable command order.",
+            "signature": "function flatten(groups: FilteredGroup[]): Command[];"
+          },
+          {
+            "name": "Launchpad",
+            "description": "",
+            "signature": "function Launchpad({ descriptor, open, onClose, onNavigate, onOpenView, onRun, onResolveQuery, agentGroupTitle, }: LaunchpadProps): ReactNode;"
+          },
+          {
+            "name": "LaunchpadProps",
+            "description": "",
+            "signature": "interface LaunchpadProps {\n    /** The command palette to render. */\n    descriptor: LaunchpadDescriptor;\n    /** Whether the overlay is shown. The host toggles this (e.g. on ⌘K). */\n    open: boolean;\n    /** Called when the palette should close (Escape, backdrop click, or after a\n     *  terminal command runs). */\n    onClose: () => void;\n    /** Host router for a `navigate` command. Absent ⇒ window.location.assign. */\n    onNavigate?: (route: string) => void;\n    /** Host handler for an `open_view_id` command. Absent ⇒ the MeridianProvider\n     *  action handler is called with (\"open-view\", viewId). */\n    onOpenView?: (viewId: string) => void;\n    /** Notified for every command run (telemetry / recents), after dispatch. */\n    onRun?: (command: Command) => void;\n    /**\n     * AI-launchpad seam: hand a non-empty query to a host-provided agent resolver\n     * (debounced ~250ms) that returns runnable Commands, surfaced under the agent\n     * group. This is how a natural-language query (\"show me failing builds\") becomes\n     * a command — the host wires it to its agent/LLM (e.g. the meridian-chat MCP\n     * host). Memoize it (useCallback) so it doesn't re-run every keystroke's render.\n     */\n    onResolveQuery?: (query: string) => Promise<Command[]>;\n    /** Heading for the agent-resolved commands group. Default \"Ask the agent\". */\n    agentGroupTitle?: string;\n}"
+          },
+          {
+            "name": "matchScore",
+            "description": "Case-insensitive subsequence score. Returns a number (LOWER is better: reward\nan early first hit and few gaps between matched characters) or `null` when the\nquery is not a subsequence. An empty query matches everything with score 0.",
+            "signature": "function matchScore(haystack: string, query: string): number | null;"
+          }
+        ]
+      }
+    ],
+    "modulePatterns": []
+  },
+  {
+    "slug": "mui-kit",
+    "title": "MUI kit",
+    "package": "@savvifi/meridian-mui-kit",
+    "version": "0.25.1",
+    "entrypoints": [
+      {
+        "specifier": "@savvifi/meridian-mui-kit",
+        "exports": [
+          {
+            "name": "ActionView",
+            "description": "",
+            "signature": "function ActionView({ panel }: {\n    panel: ActionPanel;\n}): ReactNode;"
+          },
+          {
+            "name": "CatalogView",
+            "description": "",
+            "signature": "function CatalogView({ panel }: {\n    panel: CatalogPanel;\n}): ReactNode;"
+          },
+          {
+            "name": "ChoiceView",
+            "description": "",
+            "signature": "function ChoiceView({ panel }: {\n    panel: ChoicePanel;\n}): ReactNode;"
+          },
+          {
+            "name": "ConnectFlowView",
+            "description": "",
+            "signature": "function ConnectFlowView({ panel }: {\n    panel: ConnectFlowPanel;\n}): ReactNode;"
+          },
+          {
+            "name": "CopyValueView",
+            "description": "",
+            "signature": "function CopyValueView({ value }: {\n    value: CopyValue;\n}): ReactNode;"
+          },
+          {
+            "name": "createMuiThemeFromConfig",
+            "description": "Build a MUI theme from a ThemeConfig (the lifted `createStudioTheme`).",
+            "signature": "function createMuiThemeFromConfig(config: ThemeConfig): MuiTheme;"
+          },
+          {
+            "name": "DisplayedValue",
+            "description": "A resolved value plus the absolute string a relative label hangs its title on.",
+            "signature": "interface DisplayedValue {\n    /** What to render. */\n    text: string;\n    /** The absolute form, when `text` is relative and the surface can show both. */\n    title?: string;\n}"
+          },
+          {
+            "name": "displayValueList",
+            "description": "The individual values behind a field, for surfaces that render one chip each.",
+            "signature": "function displayValueList(value: unknown): string[];"
+          },
+          {
+            "name": "EMPTY_DISPLAY",
+            "description": "The em dash every read surface uses for \"no value\".",
+            "signature": "const EMPTY_DISPLAY = \"\\u2014\";"
+          },
+          {
+            "name": "FontSourceView",
+            "description": "One obtainable font file, as `meridian.theme.v1.FontSource`.",
+            "signature": "interface FontSourceView {\n    family: string;\n    srcUri: string;\n    weight: string;\n    style: string;\n    unicodeRange: string;\n    display: string;\n}"
+          },
+          {
+            "name": "formatByDisplay",
+            "description": "Format a value according to its declared `ValueDisplay`.\n\n`nowMs` is OPTIONAL and its absence is meaningful: without it, a temporal field\nthat asked to read relatively falls back to ABSOLUTE. That is what makes a\nserver render and a first client paint agree — the caller passes an instant only\nonce it is on the client (see useDisplayNow). A renderer that never passes one\nstill gets correct, stable output; it just never says \"5 days ago\".\n\nAn unset or UNSPECIFIED type defers entirely to `formatDisplayValue`, so a\ndescriptor with no ValueDisplay renders exactly as it does today.",
+            "signature": "function formatByDisplay(value: unknown, display: ValueDisplay | undefined, nowMs?: number): DisplayedValue;"
+          },
+          {
+            "name": "formatDisplayValue",
+            "description": "A resolved field value as display text. Arrays join, objects stringify,\nbooleans read Yes/No, timestamps humanize, empty reads as an em dash.",
+            "signature": "function formatDisplayValue(value: unknown): string;"
+          },
+          {
+            "name": "formatRelativeTime",
+            "description": "`2026-07-25T09:18:00Z` at 2026-07-30 → \"5 days ago\"; a future instant → \"in 3\nmonths\". `nowMs` is a PARAMETER, never `Date.now()` read internally, and that is\nthe whole point: relative text is a function of NOW, so a server and a client\nthat each call the clock render different strings and React reports a hydration\nmismatch across the subtree. The caller supplies one instant — or withholds it,\nand gets the absolute form (see `formatByDisplay`).\n\nReturns undefined when the text is not a timestamp, matching formatTimestamp.",
+            "signature": "function formatRelativeTime(text: string, nowMs: number): string | undefined;"
+          },
+          {
+            "name": "formatTimestamp",
+            "description": "`2026-03-29T00:00:00.000Z` → `Mar 29, 2026`\n`2026-03-21T09:14:00.000Z` → `Mar 21, 2026, 9:14 AM UTC`\n`2026-03-29`               → `Mar 29, 2026`\n\nMidnight UTC is treated as a DATE, not a moment: the graph stores plain dates\n(a due date, a plan-year start) as midnight-Z, and printing \"12:00 AM\" on\nevery one of them is noise that reads like a real time-of-day.\n\nReturns undefined when the text is not a timestamp, so callers fall through to\ntheir own handling rather than getting \"Invalid Date\".",
+            "signature": "function formatTimestamp(text: string): string | undefined;"
+          },
+          {
+            "name": "GrammarView",
+            "description": "",
+            "signature": "function GrammarView({ panel }: {\n    panel: GrammarPanel;\n}): ReactNode;"
+          },
+          {
+            "name": "MediaView",
+            "description": "",
+            "signature": "function MediaView({ panel }: {\n    panel: MediaPanel;\n}): ReactNode;"
+          },
+          {
+            "name": "MeridianColumn",
+            "description": "",
+            "signature": "interface MeridianColumn<T> {\n    id: string;\n    header: string;\n    width?: string | number;\n    align?: \"left\" | \"right\" | \"center\";\n    /** When true, the header renders a clickable sort toggle (host-controlled sort). */\n    sortable?: boolean;\n    render: (row: T) => ReactNode;\n}"
+          },
+          {
+            "name": "MeridianDetailHeader",
+            "description": "",
+            "signature": "function MeridianDetailHeader({ panel, invoker, }: {\n    panel: DetailHeaderPanel;\n    invoker: RpcInvoker;\n}): ReactNode;"
+          },
+          {
+            "name": "MeridianForm",
+            "description": "",
+            "signature": "function MeridianForm({ title, description, fields, submit, }: MeridianFormProps): ReactNode;"
+          },
+          {
+            "name": "MeridianFormField",
+            "description": "",
+            "signature": "type MeridianFormField = (BaseField & {\n    type?: \"text\";\n    value: string;\n    onChange: (value: string) => void;\n}) | (BaseField & {\n    type: \"number\";\n} & NumericField) | (BaseField & {\n    type: \"decimal\";\n} & NumericField) | (BaseField & {\n    type: \"boolean\";\n    value: boolean;\n    onChange: (value: boolean) => void;\n}) | (BaseField & {\n    type: \"select\";\n    value: string;\n    onChange: (value: string) => void;\n    options: {\n        value: string;\n        label: string;\n    }[];\n}) | (BaseField & {\n    type: \"group\";\n    fields: MeridianFormField[];\n}) | (BaseField & {\n    type: \"list\";\n    items: MeridianFormField[];\n    addLabel: string;\n    canAdd: boolean;\n    canRemove: boolean;\n    onAdd: () => void;\n    onRemove: (index: number) => void;\n    onMoveUp: (index: number) => void;\n    onMoveDown: (index: number) => void;\n});"
+          },
+          {
+            "name": "MeridianFormProps",
+            "description": "",
+            "signature": "interface MeridianFormProps {\n    title?: string;\n    description?: ReactNode;\n    fields: MeridianFormField[];\n    submit: MeridianFormSubmit;\n}"
+          },
+          {
+            "name": "MeridianMuiProvider",
+            "description": "",
+            "signature": "function MeridianMuiProvider({ invoker, theme, mode, adhoc, onAction, renderIcon, renderGrammar, resolveHref, resolveAssetSrc, children, }: MeridianMuiProviderProps): ReactNode;"
+          },
+          {
+            "name": "MeridianMuiProviderProps",
+            "description": "",
+            "signature": "interface MeridianMuiProviderProps {\n    invoker: RpcInvoker;\n    /** The meridian skin. Optional — falls back to neutral MUI defaults. */\n    theme?: Theme;\n    /** light | dark selection into the Theme's palettes. */\n    mode?: \"light\" | \"dark\";\n    /** Host adhoc-panel handlers, keyed by AdhocPanel.handler_id. */\n    adhoc?: Record<string, ReactAdhocFactory>;\n    /**\n     * Host handler for no-call actions (view_details / edit / create … — the\n     * host-resolved keys that host projects without an RpcCall). Absent ⇒ those\n     * buttons render but no-op; RpcCall actions always route through the invoker.\n     */\n    onAction?: MeridianActionHandler;\n    /** Host glyph resolver for the content shapes' `icon` keys (renderer draws,\n     *  host wires). Absent ⇒ no glyph drawn (the key still lands as `data-icon`). */\n    renderIcon?: MeridianIconResolver;\n    /** Host transcoder for GrammarPanel (markdown / mermaid / vega …). Absent/null\n     *  ⇒ the degradation ladder (native markdown → alt → source). */\n    renderGrammar?: MeridianGrammarResolver;\n    /** Host resolver for a table cell's link destination (ColumnLink). Absent ⇒\n     *  link cells render as plain text. */\n    resolveHref?: MeridianHrefResolver;\n    /** Host resolver for asset (image) URLs a panel renders — e.g. prefix a mount\n     *  base or swap a CDN host. Used by the Gallery's images. Absent ⇒ src verbatim. */\n    resolveAssetSrc?: MeridianAssetResolver;\n    children?: ReactNode;\n}"
+          },
+          {
+            "name": "MeridianRecordCard",
+            "description": "",
+            "signature": "function MeridianRecordCard({ panel, invoker, }: {\n    panel: RecordCardPanel;\n    invoker: RpcInvoker;\n}): ReactNode;"
+          },
+          {
+            "name": "MeridianTable",
+            "description": "",
+            "signature": "function MeridianTable<T>({ columns, rows, loading, emptyMessage, getRowKey, pagination, rowActions, onRowClick, sort, footer, size, }: MeridianTableProps<T>): ReactNode;"
+          },
+          {
+            "name": "MeridianTableProps",
+            "description": "",
+            "signature": "interface MeridianTableProps<T> {\n    columns: MeridianColumn<T>[];\n    rows: T[];\n    loading?: boolean;\n    emptyMessage?: string;\n    getRowKey?: (row: T, index: number) => string | number;\n    pagination?: MeridianTablePager;\n    /** Per-row actions rendered in a trailing ⋮ overflow-menu column (edit/delete …). */\n    rowActions?: MeridianRowAction<T>[];\n    /** Clicking a row (open the entity). Adds a pointer cursor + hover affordance. */\n    onRowClick?: (row: T) => void;\n    /** Host-controlled column sort. Absent ⇒ headers are plain (no sort). */\n    sort?: MeridianSortState;\n    /** Trailing meta line, e.g. \"Showing 12 of 340 products\". */\n    footer?: ReactNode;\n    /** Row density. Default \"medium\" (parity with the old studio DataTableView). */\n    size?: \"small\" | \"medium\";\n}"
+          },
+          {
+            "name": "missingThemeFonts",
+            "description": "Families the skin ASKS FOR but the browser cannot resolve — i.e. the cases\nwhere the brand is silently not being applied.\n\nOnly the PRIMARY family of each stack is checked: everything after it is a\ndeliberate fallback, so warning about those would be noise. Returns [] when\nthe Font Loading API is unavailable (SSR, jsdom), since absence of evidence\nis not evidence of a missing font.",
+            "signature": "function missingThemeFonts(theme: Theme | undefined): string[];"
+          },
+          {
+            "name": "muiKit",
+            "description": "The MUI ComponentKit — plug into MeridianProvider / reactWebRenderer.",
+            "signature": "const muiKit: ComponentKit;"
+          },
+          {
+            "name": "primaryFamily",
+            "description": "The first concrete family named in a CSS font stack — the face the brand\nactually asks for; everything after it is a deliberate fallback. Returns\nundefined for a stack that is entirely generic.",
+            "signature": "function primaryFamily(stack: string): string | undefined;"
+          },
+          {
+            "name": "SnippetView",
+            "description": "",
+            "signature": "function SnippetView({ snippet }: {\n    snippet: Snippet;\n}): ReactNode;"
+          },
+          {
+            "name": "StatView",
+            "description": "",
+            "signature": "function StatView({ panel }: {\n    panel: StatPanel;\n}): ReactNode;"
+          },
+          {
+            "name": "StepsView",
+            "description": "",
+            "signature": "function StepsView({ panel }: {\n    panel: StepsPanel;\n}): ReactNode;"
+          },
+          {
+            "name": "ThemeConfig",
+            "description": "",
+            "signature": "interface ThemeConfig {\n    mode: \"light\" | \"dark\";\n    primary: {\n        main: string;\n        light: string;\n        dark: string;\n    };\n    secondary: {\n        main: string;\n    };\n    background: {\n        default: string;\n        paper: string;\n    };\n    text: {\n        primary: string;\n        secondary: string;\n    };\n    border: {\n        card: string;\n        button: string;\n    };\n    typography: {\n        /** UI / body font stack. */\n        sans: string;\n        /** Heading font stack. Falls back to `sans` for single-face brands. */\n        display: string;\n        /** Code font stack. */\n        mono: string;\n        baseSizePx: number;\n        headingWeight: number;\n        bodyWeight: number;\n        /** Heading letter-spacing in em, e.g. \"-0.015\". */\n        headingTracking: string;\n    };\n    metrics: {\n        radiusPx: number;\n        unitPx: number;\n    };\n}"
+          },
+          {
+            "name": "themeFontSources",
+            "description": "The font sources a skin declares (empty when it ships none).",
+            "signature": "function themeFontSources(theme: Theme | undefined): FontSourceView[];"
+          },
+          {
+            "name": "themeProtoToCssVars",
+            "description": "The meridian palette as the `--mer-*` CSS custom properties that ViewRenderer's\nkit-neutral layout chrome (the tab strip, etc.) reads. Applied by\nMeridianMuiProvider so the layout affordances pick up the active skin — the\nsame variables the web-components / html renderers use, so one skin styles all.",
+            "signature": "function themeProtoToCssVars(theme: Theme | undefined, mode?: \"light\" | \"dark\"): CSSProperties;"
+          },
+          {
+            "name": "themeProtoToFontFaceCss",
+            "description": "The skin's declared faces as `@font-face` CSS.\n\nThis is what lets a skin keep its own promise. Without it a stack naming\n\"Quicksand\" renders in whatever the host happens to have loaded, and a brand\nsilently does not apply. Emitting the sources the skin declares makes the\nnamed face actually available.\n\nReturns \"\" when the skin declares no sources, so hosts that load fonts\nthemselves are unaffected.",
+            "signature": "function themeProtoToFontFaceCss(theme: Theme | undefined): string;"
+          },
+          {
+            "name": "themeProtoToMuiTheme",
+            "description": "Build a ready-to-use MUI theme directly from a meridian Theme.",
+            "signature": "function themeProtoToMuiTheme(theme: Theme | undefined, mode?: \"light\" | \"dark\"): MuiTheme;"
+          },
+          {
+            "name": "themeProtoToThemeConfig",
+            "description": "Map a meridian Theme (+ mode) to a MUI-shaped ThemeConfig of design tokens.",
+            "signature": "function themeProtoToThemeConfig(theme: Theme | undefined, mode?: \"light\" | \"dark\"): ThemeConfig;"
+          },
+          {
+            "name": "useDisplayNow",
+            "description": "`undefined` during SSR and the first client paint, then a fixed millisecond\ninstant. Pass straight into `formatByDisplay(value, display, now)`.",
+            "signature": "function useDisplayNow(): number | undefined;"
+          }
+        ]
+      },
+      {
+        "specifier": "@savvifi/meridian-mui-kit/shell",
+        "exports": [
+          {
+            "name": "activeNodeId",
+            "description": "The single node the rail should mark active, or `undefined`.\n\n⛔ The LONGEST match wins, not the first. With `/plans` and `/plans/renewals` both in the\ntree, `/plans/renewals/42` is inside both, and a first-match walk highlights whichever\nhappens to be authored earlier. Sorting by specificity makes the answer independent of\nauthoring order — which matters because a NavTree can be assembled at runtime, where\n\"authoring order\" is whatever the graph returned.",
+            "signature": "function activeNodeId(tree: NavTree | undefined, pathname: string, seams: AppShellSeams): string | undefined;"
+          },
+          {
+            "name": "ancestorsOf",
+            "description": "The ids of every group that must be open for `activeId` to be visible.\n\nWithout this, landing directly on a URL nested inside a collapsed group shows a rail with\nnothing selected — the item is highlighted, inside a group that is shut.",
+            "signature": "function ancestorsOf(tree: NavTree | undefined, activeId: string | undefined): string[];"
+          },
+          {
+            "name": "AppHeaderView",
+            "description": "",
+            "signature": "function AppHeaderView(): React.JSX.Element;"
+          },
+          {
+            "name": "AppShellProps",
+            "description": "What the shell is mounted with: the descriptor, plus the seams.",
+            "signature": "interface AppShellProps {\n    shell: AppShell;\n    seams: AppShellSeams;\n    children?: React.ReactNode;\n}"
+          },
+          {
+            "name": "AppShellSeams",
+            "description": "Everything the descriptor cannot carry.",
+            "signature": "interface AppShellSeams {\n    /** REQUIRED. See the note at the top of this file. */\n    routing: ShellRouting;\n    /**\n     * Turn a nav leaf into an href.\n     *\n     * Normally unnecessary — a leaf that sets `route` already carries its href. This is for\n     * the other two arms: a `panelId`/`viewId` leaf has no URL of its own, and only the host\n     * knows which URL shows that panel. Returning `undefined` renders the node as an inert\n     * label rather than a dead link.\n     */\n    hrefFor?: (node: NavNodeLike) => string | undefined;\n    /** Rendered at the header start. Absent ⇒ `brand_text`, then `title`. */\n    brandLogo?: React.ReactNode;\n    /**\n     * Host chrome rendered in the app bar, just before the identity menu.\n     *\n     * For the controls that are NOT navigation and therefore cannot be a `NavNode`: a theme\n     * switch, an environment badge, a notifications bell. `NavNode` is a label and a target —\n     * a three-way light/auto/dark toggle is neither, and encoding it as one would mean\n     * inventing a pseudo-route whose only job is to be intercepted.\n     *\n     * Also the home for links that are deliberately OFF-ROUTER — an admin console on another\n     * origin, a logout that must hit the IdP rather than a client route. The descriptor's\n     * `user_menu` is for destinations inside the app; these are not.\n     */\n    headerActions?: React.ReactNode;\n    /**\n     * Host chrome rendered in the page-header row, above the page content.\n     *\n     * Normally breadcrumbs. Deliberately a NODE rather than descriptor data: a breadcrumb trail\n     * is derived from the host's route table and its loaded record (\"Teams / Acme / Members\"),\n     * which the shell cannot see and which changes on every navigation. The shell owns the ROW\n     * — its placement, its divider, and the fact that `pageActions` shares it — and the host\n     * owns what the trail says.\n     */\n    pageChrome?: React.ReactNode;\n    /**\n     * Called when the scope selector changes.\n     *\n     * The descriptor says what may be chosen and what is chosen now; changing it is an action\n     * only the host can perform — it may re-query, re-route, or write a cookie.\n     */\n    onScopeChange?: (id: string) => void;\n    /**\n     * The dock's content — normally `<Conversation>` from `@savvifi/meridian-chat`.\n     *\n     * A node, not a chat client. The shell owns the DOCK (width, the reflow of the main\n     * column, the toggle); it does not own the transport, and `@savvifi/meridian-chat` stays\n     * an OPTIONAL peer so an app with no chat pays nothing. This is the seam that host's own\n     * `chat-dock.tsx` predicted: it mounts `<Conversation>` as a sibling of the shell and says\n     * that \"if the dock ever needs to reflow the sidebar or share the shell's hotkey registry\n     * it should move into the shell's chromeCapabilities.\"\n     */\n    chatPanel?: React.ReactNode;\n}"
+          },
+          {
+            "name": "AppShellView",
+            "description": "The app frame. One component, one descriptor, one set of seams.",
+            "signature": "function AppShellView({ shell, seams, children }: AppShellProps): React.JSX.Element;"
+          },
+          {
+            "name": "brandOf",
+            "description": "The wordmark, in priority order: host node, then `brand_text`, then `title`.",
+            "signature": "function brandOf(shell: AppShell, seams: AppShellSeams): React.ReactNode | string;"
+          },
+          {
+            "name": "capabilitiesOf",
+            "description": "",
+            "signature": "function capabilitiesOf(shell: AppShell): ShellCapabilities;"
+          },
+          {
+            "name": "defaultCommands",
+            "description": "The commands `default_command_ids` names, in that order. Unknown ids are ignored.",
+            "signature": "function defaultCommands(launchpad: Launchpad): Command[];"
+          },
+          {
+            "name": "displayKeys",
+            "description": "The glyphs to draw for a binding.\n\n⛔ TAKES THE ANSWER, AND READS NOTHING ITSELF. This used to default the platform to\n`typeof navigator === \"undefined\" ? \"\" : navigator.platform`, with a comment claiming that\navoided a hydration mismatch. It caused one: a default argument is evaluated at every CALL,\nso the server (no `navigator`) rendered \"Ctrl\" while the browser's very first render — the\nhydrating one — rendered \"⌘\", and React threw away the tree over a chip in the header.\n\nThe platform is a client-only fact, so it has to be resolved after mount. `useIsApplePlatform`\n(context.tsx) does that; this stays pure and testable.",
+            "signature": "function displayKeys(hotkey: ShellHotkey, apple?: boolean): string[];"
+          },
+          {
+            "name": "flatten",
+            "description": "Every matched command, flattened — what ↑/↓ actually walks.",
+            "signature": "function flatten(groups: readonly MatchedGroup[]): Command[];"
+          },
+          {
+            "name": "hrefForNode",
+            "description": "The href a leaf points at, or `undefined` for a group / an unresolvable target.\n\nThe three target arms are not equivalent:\n\n  • `route`   — the node carries its own href. Nothing to resolve.\n  • `panelId` — a panel has no URL of its own; only the host knows what URL shows it.\n  • `viewId`  — likewise.\n\nSo `route` is answered here and the other two are handed to the host's `hrefFor`. A host\nthat supplies none gets `undefined`, which renders as an inert label — deliberately, and\nnot as `href=\"#\"`. A dead link that looks live is worse than a label that looks inert.",
+            "signature": "function hrefForNode(node: NavNodeLike, seams: AppShellSeams): string | undefined;"
+          },
+          {
+            "name": "initiallyOpenGroups",
+            "description": "Group ids open on first render: those marked `default_open`, plus the active node's.",
+            "signature": "function initiallyOpenGroups(tree: NavTree | undefined, activeId: string | undefined): Set<string>;"
+          },
+          {
+            "name": "isActive",
+            "description": "Is `pathname` inside `href`?\n\n⛔ Not `pathname === href`, and not `pathname.startsWith(href)` either — both are wrong in\na way that shows up immediately in a real app:\n\n  • exact match leaves the rail with NOTHING highlighted on every detail page, because\n    `/sponsors/abc` is not `/sponsors`.\n  • bare `startsWith` highlights `/plan` when you are on `/plan-years`, since one string\n    is a prefix of the other without being a path prefix of it.\n\nSo: equal, or a prefix that ends at a segment boundary. `/` is special-cased because\nevery path starts with it and it would otherwise always match.",
+            "signature": "function isActive(pathname: string, href: string): boolean;"
+          },
+          {
+            "name": "isEditableTarget",
+            "description": "Is the event target something a keystroke belongs to?",
+            "signature": "function isEditableTarget(target: EventTarget | null): boolean;"
+          },
+          {
+            "name": "isGroup",
+            "description": "A leaf is a node with a target; a group is a node with children and no target.",
+            "signature": "function isGroup(node: NavNode): boolean;"
+          },
+          {
+            "name": "isHotkeyEnabled",
+            "description": "",
+            "signature": "function isHotkeyEnabled(id: ShellHotkeyId, capabilities: ShellCapabilities): boolean;"
+          },
+          {
+            "name": "LaunchpadView",
+            "description": "",
+            "signature": "function LaunchpadView(): React.JSX.Element | null;"
+          },
+          {
+            "name": "matchCommands",
+            "description": "The groups to show for `query`.\n\nAn empty query shows `default_command_ids` first (recents/pinned) when the descriptor\nnames any, and otherwise the groups as authored. Both are the descriptor's decision, not\nthis function's — a palette that reordered an unsearched list would be overruling the\nserver's relevance ranking, which is the one thing `LayoutService.GetLaunchpad` exists to\nprovide.",
+            "signature": "function matchCommands(launchpad: Launchpad | undefined, query: string): MatchedGroup[];"
+          },
+          {
+            "name": "MatchedGroup",
+            "description": "One group with its surviving commands. Groups that match nothing are dropped.",
+            "signature": "interface MatchedGroup {\n    readonly id: string;\n    readonly title: string;\n    readonly commands: readonly Command[];\n}"
+          },
+          {
+            "name": "matchHotkey",
+            "description": "The hotkey a keydown should fire, or `undefined`.",
+            "signature": "function matchHotkey(event: Pick<KeyboardEvent, \"key\" | \"metaKey\" | \"ctrlKey\" | \"target\">, capabilities: ShellCapabilities): ShellHotkey | undefined;"
+          },
+          {
+            "name": "moveIndex",
+            "description": "Move the highlight, wrapping at both ends.\n\nWrapping rather than clamping: a palette is a short list a user pages through with one\nfinger, and stopping at the bottom makes reaching the last item mean releasing and\npressing the other arrow. Returns 0 for an empty list so the caller needs no special case.",
+            "signature": "function moveIndex(current: number, delta: number, length: number): number;"
+          },
+          {
+            "name": "NavNodeLike",
+            "description": "The subset of `NavNode` a resolver is handed. Structural, so tests need no proto.",
+            "signature": "interface NavNodeLike {\n    readonly id: string;\n    readonly label: string;\n    readonly target?: {\n        readonly case?: string;\n        readonly value?: unknown;\n    };\n}"
+          },
+          {
+            "name": "ResolvedScope",
+            "description": "The scope selector's resolved view — descriptor data plus the host's callback.",
+            "signature": "interface ResolvedScope {\n    selector: ScopeSelector;\n    onChange: (id: string) => void;\n}"
+          },
+          {
+            "name": "resolveScope",
+            "description": "",
+            "signature": "function resolveScope(shell: AppShell, seams: AppShellSeams): ResolvedScope | undefined;"
+          },
+          {
+            "name": "resolveSidebarSx",
+            "description": "",
+            "signature": "function resolveSidebarSx(variant: \"persistent\" | \"temporary\", open: boolean): SxProps<Theme>;"
+          },
+          {
+            "name": "SHELL_HOTKEYS",
+            "description": "",
+            "signature": "const SHELL_HOTKEYS: readonly ShellHotkey[];"
+          },
+          {
+            "name": "ShellCapabilities",
+            "description": "",
+            "signature": "interface ShellCapabilities {\n    sidebar: boolean;\n    launchpad: boolean;\n    hotkeyHelp: boolean;\n    chat: boolean;\n}"
+          },
+          {
+            "name": "ShellContextValue",
+            "description": "",
+            "signature": "interface ShellContextValue {\n    shell: AppShell;\n    seams: AppShellSeams;\n    capabilities: ShellCapabilities;\n    sidebar: TogglePanel;\n    launchpad: TogglePanel;\n    hotkeyHelp: TogglePanel;\n    chat: TogglePanel;\n    /** A page's own toolbar actions, rendered in the page-header row beside `seams.pageChrome`. */\n    pageActions: React.ReactNode | null;\n    setPageActions: (actions: React.ReactNode | null) => void;\n}"
+          },
+          {
+            "name": "ShellHotkey",
+            "description": "",
+            "signature": "interface ShellHotkey {\n    id: ShellHotkeyId;\n    /** The physical key, without the modifier. Matched case-insensitively. */\n    key: string;\n    displayKeys: string[];\n    description: string;\n    /**\n     * Whether the binding still fires while a text field has focus.\n     *\n     * ⌘K must (you summon the palette from anywhere, including mid-typing). ⌘\\ must not —\n     * a user toggling the sidebar by accident while writing is a worse outcome than having\n     * to click.\n     */\n    allowInEditableTargets?: boolean;\n}"
+          },
+          {
+            "name": "ShellHotkeyId",
+            "description": "",
+            "signature": "type ShellHotkeyId = \"launchpad\" | \"sidebar-toggle\" | \"hotkey-help\";"
+          },
+          {
+            "name": "ShellLinkComponent",
+            "description": "A component that renders an anchor: `next/link`, a router's Link, or `\"a\"`.",
+            "signature": "type ShellLinkComponent = React.ComponentType<{\n    href: string;\n    children?: React.ReactNode;\n    [key: string]: unknown;\n}>;"
+          },
+          {
+            "name": "ShellProvider",
+            "description": "",
+            "signature": "function ShellProvider({ shell, seams, children, }: {\n    shell: AppShell;\n    seams: AppShellSeams;\n    children: React.ReactNode;\n}): React.JSX.Element;"
+          },
+          {
+            "name": "ShellRouting",
+            "description": "The two things the shell needs from a router, and nothing more.\n\nDeliberately not a full router interface: the shell renders links and highlights the\nactive item. It never pushes, replaces, or reads params. Asking for less is what lets a\nhost adapt its existing router in a few lines instead of writing a shim.",
+            "signature": "interface ShellRouting {\n    Link: ShellLinkComponent;\n    usePathname: () => string;\n    /**\n     * Navigate imperatively — what the launchpad runs when a command is chosen.\n     *\n     * ⛔ Optional only for compatibility, and a host that has a router should always pass it.\n     * Without it the launchpad falls back to `window.location.assign`, which is a FULL DOCUMENT\n     * LOAD: the app re-boots, client state is lost, and ⌘K — the fastest thing in the app —\n     * becomes the slowest. A shell handed a `Link` already knows the host has a router; the\n     * fallback exists for the host that genuinely has none, not as the normal path.\n     */\n    navigate?: (route: string) => void;\n}"
+          },
+          {
+            "name": "SidebarView",
+            "description": "",
+            "signature": "function SidebarView({ variant }: {\n    variant: \"persistent\" | \"temporary\";\n}): React.JSX.Element;"
+          },
+          {
+            "name": "TogglePanel",
+            "description": "",
+            "signature": "interface TogglePanel {\n    isOpen: boolean;\n    open: () => void;\n    close: () => void;\n    toggle: () => void;\n}"
+          },
+          {
+            "name": "useIsApplePlatform",
+            "description": "Whether the viewer is on an Apple platform, for `⌘` vs `Ctrl`.\n\n⛔ Returns `false` on the server AND on the first client render, then corrects itself in an\neffect. Reading `navigator.platform` during render is a hydration mismatch, not a nicety:\nthe server has no `navigator` and renders \"Ctrl\", the browser's first render says \"⌘\", and\nReact discards the hydrated tree over a two-character chip in the header. `displayKeys`\ntakes the platform as an argument precisely so the decision can be deferred to here.",
+            "signature": "function useIsApplePlatform(): boolean;"
+          },
+          {
+            "name": "usePageActions",
+            "description": "Publish this page's toolbar actions into the page-header row, and take them down on unmount.\n\nCallers need not memoize the node — see `SetPageActionsContext` for why that is a property\nof the design rather than an accident.\n\n⛔ The teardown is the point. Without it, navigating from Sponsors to Plan Years leaves a\n\"Create sponsor\" button sitting above the plan-year list, wired to the wrong flow — a\nbutton that is not merely stale but actively wrong about what it will do.",
+            "signature": "function usePageActions(actions: React.ReactNode): void;"
+          },
+          {
+            "name": "useShell",
+            "description": "",
+            "signature": "function useShell(): ShellContextValue;"
+          },
+          {
+            "name": "walk",
+            "description": "Every node, depth-first, parents before children.",
+            "signature": "function walk(tree: NavTree | undefined): Generator<NavNode>;"
+          }
+        ]
+      }
+    ],
+    "modulePatterns": []
+  },
+  {
+    "slug": "proto-ts",
+    "title": "Protobuf types",
+    "package": "@savvifi/meridian-proto-ts",
+    "version": "0.25.1",
+    "entrypoints": [
+      {
+        "specifier": "@savvifi/meridian-proto-ts",
+        "exports": [
+          {
+            "name": "AdhocPanel",
+            "description": "",
+            "signature": "type AdhocPanel = Message<\"meridian.ui.v1.AdhocPanel\"> & {\n    /**\n     * @generated from field: string handler_id = 1;\n     */\n    handlerId: string;\n};"
+          },
+          {
+            "name": "AdhocPanelSchema",
+            "description": "Describes the message meridian.ui.v1.AdhocPanel.\nUse `create(AdhocPanelSchema)` to create a new message.",
+            "signature": "const AdhocPanelSchema: GenMessage<AdhocPanel>;"
+          },
+          {
+            "name": "DescriptorRow",
+            "description": "",
+            "signature": "type DescriptorRow = Message<\"meridian.ui.v1.DescriptorRow\"> & {\n    /**\n     * @generated from field: string label = 1;\n     */\n    label: string;\n    /**\n     * @generated from field: string source_path = 2;\n     */\n    sourcePath: string;\n    /**\n     * @generated from field: meridian.ui.v1.ValueDisplay display = 3;\n     */\n    display?: ValueDisplay | undefined;\n};"
+          },
+          {
+            "name": "DescriptorRowSchema",
+            "description": "Describes the message meridian.ui.v1.DescriptorRow.\nUse `create(DescriptorRowSchema)` to create a new message.",
+            "signature": "const DescriptorRowSchema: GenMessage<DescriptorRow>;"
+          },
+          {
+            "name": "DetailHeaderPanel",
+            "description": "",
+            "signature": "type DetailHeaderPanel = Message<\"meridian.ui.v1.DetailHeaderPanel\"> & {\n    /**\n     * @generated from field: string title = 1;\n     */\n    title: string;\n    /**\n     * @generated from field: string title_source_path = 2;\n     */\n    titleSourcePath: string;\n    /**\n     * @generated from field: string subtitle_source_path = 3;\n     */\n    subtitleSourcePath: string;\n    /**\n     * @generated from field: string status_source_path = 4;\n     */\n    statusSourcePath: string;\n    /**\n     * @generated from field: repeated meridian.ui.v1.DescriptorRow descriptor_rows = 5;\n     */\n    descriptorRows: DescriptorRow[];\n    /**\n     * @generated from field: meridian.ui.v1.RpcCall populate = 6;\n     */\n    populate?: RpcCall | undefined;\n    /**\n     * @generated from field: string id_field = 7;\n     */\n    idField: string;\n};"
+          },
+          {
+            "name": "DetailHeaderPanelSchema",
+            "description": "Describes the message meridian.ui.v1.DetailHeaderPanel.\nUse `create(DetailHeaderPanelSchema)` to create a new message.",
+            "signature": "const DetailHeaderPanelSchema: GenMessage<DetailHeaderPanel>;"
+          },
+          {
+            "name": "file_proto_panel",
+            "description": "Describes the file proto/panel.proto.",
+            "signature": "const file_proto_panel: GenFile;"
+          },
+          {
+            "name": "FormMode",
+            "description": "",
+            "signature": "enum FormMode {\n    /**\n     * @generated from enum value: FORM_MODE_UNSPECIFIED = 0;\n     */\n    UNSPECIFIED = 0,\n    /**\n     * @generated from enum value: FORM_MODE_READONLY = 1;\n     */\n    READONLY = 1,\n    /**\n     * @generated from enum value: FORM_MODE_EDIT = 2;\n     */\n    EDIT = 2\n}"
+          },
+          {
+            "name": "FormModeSchema",
+            "description": "Describes the enum meridian.ui.v1.FormMode.",
+            "signature": "const FormModeSchema: GenEnum<FormMode>;"
+          },
+          {
+            "name": "FormPanel",
+            "description": "",
+            "signature": "type FormPanel = Message<\"meridian.ui.v1.FormPanel\"> & {\n    /**\n     * @generated from field: repeated meridian.ui.v1.FormField fields = 1;\n     */\n    fields: FormField[];\n    /**\n     * @generated from field: meridian.ui.v1.FormMode mode = 2;\n     */\n    mode: FormMode;\n    /**\n     * @generated from field: meridian.ui.v1.RpcCall submit = 3;\n     */\n    submit?: RpcCall | undefined;\n    /**\n     * @generated from field: string item_noun = 4;\n     */\n    itemNoun: string;\n};"
+          },
+          {
+            "name": "FormPanelSchema",
+            "description": "Describes the message meridian.ui.v1.FormPanel.\nUse `create(FormPanelSchema)` to create a new message.",
+            "signature": "const FormPanelSchema: GenMessage<FormPanel>;"
+          },
+          {
+            "name": "PanelBundle",
+            "description": "",
+            "signature": "type PanelBundle = Message<\"meridian.ui.v1.PanelBundle\"> & {\n    /**\n     * @generated from field: string version = 1;\n     */\n    version: string;\n    /**\n     * @generated from field: repeated meridian.ui.v1.PanelDescriptor panels = 2;\n     */\n    panels: PanelDescriptor[];\n};"
+          },
+          {
+            "name": "PanelBundleSchema",
+            "description": "Describes the message meridian.ui.v1.PanelBundle.\nUse `create(PanelBundleSchema)` to create a new message.",
+            "signature": "const PanelBundleSchema: GenMessage<PanelBundle>;"
+          },
+          {
+            "name": "PanelDescriptor",
+            "description": "",
+            "signature": "type PanelDescriptor = Message<\"meridian.ui.v1.PanelDescriptor\"> & {\n    /**\n     * @generated from field: string panel_id = 1;\n     */\n    panelId: string;\n    /**\n     * @generated from field: string title = 2;\n     */\n    title: string;\n    /**\n     * @generated from oneof meridian.ui.v1.PanelDescriptor.body\n     */\n    body: {\n        /**\n         * @generated from field: meridian.ui.v1.TablePanel table = 3;\n         */\n        value: TablePanel;\n        case: \"table\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.LroPanel lro = 4;\n         */\n        value: LroPanel;\n        case: \"lro\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.AdhocPanel adhoc = 5;\n         */\n        value: AdhocPanel;\n        case: \"adhoc\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.PromptPanel prompt = 6;\n         */\n        value: PromptPanel;\n        case: \"prompt\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.LlmPromptPanel llm_prompt = 7;\n         */\n        value: LlmPromptPanel;\n        case: \"llmPrompt\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.GalleryPanel gallery = 8;\n         */\n        value: GalleryPanel;\n        case: \"gallery\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.FormPanel form = 9;\n         */\n        value: FormPanel;\n        case: \"form\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.ChoicePanel choice = 10;\n         */\n        value: ChoicePanel;\n        case: \"choice\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.SnippetPanel snippet = 11;\n         */\n        value: SnippetPanel;\n        case: \"snippet\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.ActionPanel action = 12;\n         */\n        value: ActionPanel;\n        case: \"action\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.ConnectFlowPanel connect_flow = 13;\n         */\n        value: ConnectFlowPanel;\n        case: \"connectFlow\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.CopyValuePanel copy_value = 14;\n         */\n        value: CopyValuePanel;\n        case: \"copyValue\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.CatalogPanel catalog = 15;\n         */\n        value: CatalogPanel;\n        case: \"catalog\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.TerminalPanel terminal = 16;\n         */\n        value: TerminalPanel;\n        case: \"terminal\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.GrammarPanel grammar = 17;\n         */\n        value: GrammarPanel;\n        case: \"grammar\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.StatPanel stat = 18;\n         */\n        value: StatPanel;\n        case: \"stat\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.DetailHeaderPanel detail_header = 19;\n         */\n        value: DetailHeaderPanel;\n        case: \"detailHeader\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.RecordCardPanel record_card = 20;\n         */\n        value: RecordCardPanel;\n        case: \"recordCard\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.StepsPanel steps = 21;\n         */\n        value: StepsPanel;\n        case: \"steps\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.MediaPanel media = 22;\n         */\n        value: MediaPanel;\n        case: \"media\";\n    } | {\n        /**\n         * @generated from field: meridian.ui.v1.StreamPanel stream = 23;\n         */\n        value: StreamPanel;\n        case: \"stream\";\n    } | {\n        case: undefined;\n        value?: undefined;\n    };\n};"
+          },
+          {
+            "name": "PanelDescriptorSchema",
+            "description": "Describes the message meridian.ui.v1.PanelDescriptor.\nUse `create(PanelDescriptorSchema)` to create a new message.",
+            "signature": "const PanelDescriptorSchema: GenMessage<PanelDescriptor>;"
+          },
+          {
+            "name": "RecordCardPanel",
+            "description": "",
+            "signature": "type RecordCardPanel = Message<\"meridian.ui.v1.RecordCardPanel\"> & {\n    /**\n     * @generated from field: repeated meridian.ui.v1.FormField fields = 1;\n     */\n    fields: FormField[];\n    /**\n     * @generated from field: meridian.ui.v1.RpcCall populate = 2;\n     */\n    populate?: RpcCall | undefined;\n    /**\n     * @generated from field: string id_field = 3;\n     */\n    idField: string;\n    /**\n     * @generated from field: string item_noun = 4;\n     */\n    itemNoun: string;\n};"
+          },
+          {
+            "name": "RecordCardPanelSchema",
+            "description": "Describes the message meridian.ui.v1.RecordCardPanel.\nUse `create(RecordCardPanelSchema)` to create a new message.",
+            "signature": "const RecordCardPanelSchema: GenMessage<RecordCardPanel>;"
+          }
+        ]
+      }
+    ],
+    "modulePatterns": [
+      {
+        "specifier": "@savvifi/meridian-proto-ts/proto/*.js",
+        "modules": [
+          "@savvifi/meridian-proto-ts/proto/affordance_pb.js",
+          "@savvifi/meridian-proto-ts/proto/catalog_pb.js",
+          "@savvifi/meridian-proto-ts/proto/choice_pb.js",
+          "@savvifi/meridian-proto-ts/proto/command_palette_pb.js",
+          "@savvifi/meridian-proto-ts/proto/connect_flow_pb.js",
+          "@savvifi/meridian-proto-ts/proto/conversation_pb.js",
+          "@savvifi/meridian-proto-ts/proto/copy_value_pb.js",
+          "@savvifi/meridian-proto-ts/proto/form_pb.js",
+          "@savvifi/meridian-proto-ts/proto/gallery_pb.js",
+          "@savvifi/meridian-proto-ts/proto/grammar_pb.js",
+          "@savvifi/meridian-proto-ts/proto/layout_service_pb.js",
+          "@savvifi/meridian-proto-ts/proto/llm_prompt_pb.js",
+          "@savvifi/meridian-proto-ts/proto/lro_pb.js",
+          "@savvifi/meridian-proto-ts/proto/media_pb.js",
+          "@savvifi/meridian-proto-ts/proto/nav_tree_pb.js",
+          "@savvifi/meridian-proto-ts/proto/panel_pb.js",
+          "@savvifi/meridian-proto-ts/proto/prompt_pb.js",
+          "@savvifi/meridian-proto-ts/proto/rpc_pb.js",
+          "@savvifi/meridian-proto-ts/proto/shell_pb.js",
+          "@savvifi/meridian-proto-ts/proto/snippet_pb.js",
+          "@savvifi/meridian-proto-ts/proto/stat_pb.js",
+          "@savvifi/meridian-proto-ts/proto/steps_pb.js",
+          "@savvifi/meridian-proto-ts/proto/stream_pb.js",
+          "@savvifi/meridian-proto-ts/proto/table_pb.js",
+          "@savvifi/meridian-proto-ts/proto/terminal_pb.js",
+          "@savvifi/meridian-proto-ts/proto/theme_pb.js",
+          "@savvifi/meridian-proto-ts/proto/value_pb.js",
+          "@savvifi/meridian-proto-ts/proto/view_pb.js"
+        ]
+      },
+      {
+        "specifier": "@savvifi/meridian-proto-ts/google/api/*.js",
+        "modules": [
+          "@savvifi/meridian-proto-ts/google/api/field_behavior_pb.js"
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "schemas",
+    "title": "Schemas and runtime helpers",
+    "package": "@savvifi/meridian-schemas",
+    "version": "0.25.1",
+    "entrypoints": [
+      {
+        "specifier": "@savvifi/meridian-schemas",
+        "exports": [
+          {
+            "name": "AdhocDomFactory",
+            "description": "The web-components reference impl's adhoc-handler factory shape.",
+            "signature": "type AdhocDomFactory = (container: HTMLElement, descriptor: PanelDescriptor) => void;"
+          },
+          {
+            "name": "AdhocRegistry",
+            "description": "Impl-specific AdhocPanel handler registry: `handler_id` -> a factory. The\nfactory type is impl-specific (DOM nodes for web-components, React elements\nfor the React adapter), so it is a type parameter.",
+            "signature": "type AdhocRegistry<TFactory = AdhocDomFactory> = Record<string, TFactory>;"
+          },
+          {
+            "name": "AdmissionDenial",
+            "description": "Why a call was refused. Passed to {@link RpcAdmission.onDenied}.",
+            "signature": "interface AdmissionDenial {\n    tier: RpcTier;\n    service: string;\n    method: string;\n    /** Human-readable cause, already suitable for a log line or an overlay. */\n    reason: string;\n}"
+          },
+          {
+            "name": "AdmissionDeniedError",
+            "description": "Thrown when a call is refused. Renderers surface it; they never swallow it.",
+            "signature": "class AdmissionDeniedError extends Error {\n    readonly denial: AdmissionDenial;\n    constructor(denial: AdmissionDenial);\n}"
+          },
+          {
+            "name": "AdmissionGate",
+            "description": "A prepared policy. Build once per mount; consult before every invoke.",
+            "signature": "interface AdmissionGate {\n    /** Non-throwing test — for rendering an action as disabled rather than dead. */\n    admits(tier: RpcTier, service: string, method: string): boolean;\n    /** Throws {@link AdmissionDeniedError} unless the call is admitted. */\n    check(tier: RpcTier, service: string, method: string): void;\n}"
+          },
+          {
+            "name": "AdmissionPolicy",
+            "description": "`\"unrestricted\"` disables admission entirely. It exists so that opting out is\nexplicit and greppable rather than accidental — a host that genuinely renders\nonly first-party descriptors can say so in one word, and a reviewer can find\nevery such host with one search.",
+            "signature": "type AdmissionPolicy = RpcAdmission | \"unrestricted\";"
+          },
+          {
+            "name": "aipTier",
+            "description": "The tier an AIP standard-method name implies, or `null` when the name follows\nno standard verb (a custom method — we have nothing to say about it).\n\n`Batch` is a modifier, not a verb: BatchGet reads, BatchDelete mutates, so it\nis stripped and the remainder classified.",
+            "signature": "function aipTier(method: string): RpcTier | null;"
+          },
+          {
+            "name": "computeStat",
+            "description": "Compute a StatPanel's value/delta/trend/semantics — the parity-critical core.",
+            "signature": "function computeStat(panel: StatPanel): StatComputed;"
+          },
+          {
+            "name": "createAdmissionGate",
+            "description": "Build a gate from a host policy.\n\nWith NO policy the gate allows reads and denies mutations. That is a\nbehaviour change for hosts whose actions dial today — deliberately, and at\nthe 1.0.0 boundary, because the alternative is a default that silently\nforwards model-chosen request bodies to an authenticated backend. The denial\nmessage names the exact entry to add.",
+            "signature": "function createAdmissionGate(policy?: AdmissionPolicy): AdmissionGate;"
+          },
+          {
+            "name": "formatStatNumber",
+            "description": "Format a raw number per a ValueFormat enum value. Deterministic.",
+            "signature": "function formatStatNumber(n: number, format: number): string;"
+          },
+          {
+            "name": "GrammarHandle",
+            "description": "A live handle a host MAY return from {@link MountOptions.renderGrammar} for an\ninteractive grammar (chiefly Vega). `element`/`node` is what the renderer\nmounts; `dispose` frees the runtime on unmount. `getSignal`/`onSignal` expose\nthe grammar's named signals (Vega params/selections) so the framework can\nresolve a `signal` FieldBinding (rpc.proto) — a chart selection thus populates\nan RpcCall request and fires through the RpcInvoker, exactly like a Table\nrow-action pulls from the selected row. No bespoke event bus. A plain node\nreturn is equally valid (the simpler, non-signal form). Interaction is a second\ncapability dimension: a surface that can't do it degrades to a static snapshot\n(no live signals → a signal-bound call is inert), never losing content.",
+            "signature": "interface GrammarHandle {\n    /** The node to mount — HTMLElement (web-components) or ReactNode (React). */\n    element?: unknown;\n    /** Alias of `element` for React-flavored hosts. */\n    node?: unknown;\n    /** Cleanup on unmount / re-render (dispose the chart view + listeners). */\n    dispose?(): void;\n    /** Read a named signal's current value — resolves a `signal` FieldBinding. */\n    getSignal?(name: string): unknown;\n    /** Subscribe to a named signal; the framework re-fires signal-bound RpcCalls. */\n    onSignal?(name: string, cb: (value: unknown) => void): void;\n}"
+          },
+          {
+            "name": "MountOptions",
+            "description": "Everything a web renderer needs to mount one panel.",
+            "signature": "interface MountOptions<TTheme = Theme, TFactory = AdhocDomFactory> {\n    /** DOM node the renderer draws into. The renderer owns the subtree. */\n    container: HTMLElement;\n    /** The panel to render (meridian.ui.v1.PanelDescriptor). */\n    descriptor: PanelDescriptor;\n    /** Host transport for the populate / action RPCs. */\n    invoker: RpcInvoker;\n    /**\n     * Host policy for WHICH service/method this descriptor may dial through\n     * {@link invoker}, and at which tier. The access-control peer of the other\n     * host seams here: `renderIcon` / `resolveHref` / `renderGrammar` let the\n     * host decide how a descriptor's intent is realised; `admission` lets it\n     * decide whether that intent is permitted at all.\n     *\n     * This matters because a descriptor is data, and data now arrives from\n     * places that are not the application author — meridian-mcp accepts a\n     * model-authored ViewDescriptor and validates its SHAPE, not what it points\n     * at, while a host's invoker may carry an authenticated session.\n     *\n     * OMITTED ⇒ reads (populate) are allowed and mutations (Action.call, form\n     * submit, LRO start) are DENIED, with an error naming the entry to add.\n     * Pass `\"unrestricted\"` to opt out explicitly. See ./admission.ts.\n     */\n    admission?: AdmissionPolicy;\n    /**\n     * Host transport for SERVER-STREAMING methods — what a StreamPanel subscribes\n     * through. Optional and separate from {@link invoker} because streaming is a\n     * surface CAPABILITY, not a given: a host that cannot stream simply omits it\n     * and StreamPanel degrades down its ladder (a bounded snapshot, else the\n     * placeholder). See stream.proto.\n     */\n    streamInvoker?: StreamInvoker;\n    /** Active theme/skin (meridian.theme.v1). Each impl binds it natively. */\n    theme?: TTheme;\n    /** Runtime context (active resource path, identity, form values). */\n    context?: RenderContext;\n    /** Bespoke (AdhocPanel) handlers keyed by `handler_id`. */\n    adhoc?: AdhocRegistry<TFactory>;\n    /**\n     * Host glyph resolver: maps an `icon` KEY (ChoiceOption.icon, Affordance.icon,\n     * ConnectTarget.icon, CatalogItem.icon — brand-neutral keys the descriptor\n     * carries, e.g. \"github\", \"download\") to a renderer-native glyph. The\n     * \"renderer draws, host wires\" icon seam: the descriptor names the icon, the\n     * host supplies the vector. Return type is renderer-specific (a ReactNode for\n     * the React adapter, an HTMLElement for the web-components renderer), so it is\n     * loosely typed here. Absent ⇒ renderers emit the key as a `data-icon`\n     * attribute (never dropped) and draw no glyph.\n     */\n    renderIcon?: (key: string) => unknown;\n    /**\n     * Host route resolver — the LINK peer of the icon / grammar host seams, named\n     * by `ColumnLink` (table.proto) which says the renderer \"never builds a URL\n     * itself: it hands the host the target kind + the cell's value (the entity's\n     * id) and the host maps that to its own route\".\n     *\n     * Meridian stays URL-agnostic; hosts own routes. Return a URL to draw the cell\n     * as a link, or `null`/nothing to draw plain text — a renderer must never emit\n     * a dead link. `targetKind` is empty for a self/detail link, in which case the\n     * view's own `subject_kind` applies. `row` is the full source row, so a host\n     * that needs more than the id (a tenant, a repo) can read it.\n     */\n    resolveHref?: (opts: {\n        targetKind: string;\n        id: string;\n        row?: object;\n    }) => string | null | undefined;\n    /**\n     * Host transcoder for a GrammarPanel — a declarative grammar (markdown /\n     * mermaid / plantuml / graphviz / vega). This is the surface's capability set:\n     * the host wires it ONLY for languages this surface can display, returning a\n     * live result for those, or `null`/nothing for the rest → the renderer degrades\n     * down the ladder (native markdown → `alt` → source text). Kits import no\n     * grammar library.\n     *\n     * The return is a LIVE result, not just markup: a renderer-native node\n     * (HTMLElement for web-components, ReactNode for React) that is already\n     * interactive once mounted (vega-embed tooltips / zoom / brush \"just work\"), OR\n     * a {@link GrammarHandle} whose `element`/`node` is mounted and whose optional\n     * `dispose` frees the runtime, and whose `getSignal`/`onSignal` expose the\n     * grammar's live selections to the FRAMEWORK — which resolves them the\n     * meridian-idiomatic way (a `signal` FieldBinding source, rpc.proto) so an\n     * interactive selection fires an RpcCall through the RpcInvoker like every\n     * other panel action. A plain node return is equally valid. Loosely typed\n     * (renderer-specific); `data` is the decoded google.protobuf.Struct.\n     */\n    renderGrammar?: (opts: {\n        language: string;\n        source: string;\n        data?: unknown;\n    }) => unknown;\n}"
+          },
+          {
+            "name": "PanelHandle",
+            "description": "A handle to one mounted panel, returned by {@link WebRenderer.mount}.",
+            "signature": "interface PanelHandle {\n    /** Re-render in place with a new descriptor (same container + transport). */\n    update(descriptor: PanelDescriptor): void | Promise<void>;\n    /** Tear the panel down and release listeners / resources. */\n    unmount(): void;\n}"
+          },
+          {
+            "name": "RenderContext",
+            "description": "Context the renderer/host expects when building requests.",
+            "signature": "interface RenderContext {\n    currentResourcePath: string | null;\n    uiIdentity: object | null;\n    selectedRow: object | null;\n    formValues: Record<string, unknown>;\n}"
+          },
+          {
+            "name": "RpcAdmission",
+            "description": "What a descriptor is allowed to dial, declared by the HOST.\n\nEntries are `\"<fully.qualified.Service>/<Method>\"`, with `*` accepted as the\nmethod (`\"acme.v1.Orders/*\"`, the whole service) or as the entire entry\n(`\"*\"`, everything at that tier). Matching is exact and case-sensitive\notherwise — a service name is a proto identifier, not a URL.",
+            "signature": "interface RpcAdmission {\n    /**\n     * Methods reachable from a read callsite. OMITTED means \"any\", which is what\n     * every host does today: populate already fires freely, so defaulting reads\n     * closed would break every existing consumer on upgrade without closing the\n     * hole this module exists for.\n     */\n    reads?: readonly string[];\n    /**\n     * Methods reachable from a mutation callsite. OMITTED means NONE — the\n     * deliberate default, and the reason this module exists. A host that wants\n     * actions to dial must say which ones.\n     */\n    mutations?: readonly string[];\n    /**\n     * Deny a read-tier call whose AIP verb says it mutates (Create / Update /\n     * Patch / Delete), even when `reads` would otherwise admit it. Defaults to\n     * TRUE: this is a tripwire, never a grant — it can only ever refuse, and it\n     * refuses exactly the shape that matters, a destructive call smuggled into a\n     * populate slot where it auto-fires on mount with no user gesture.\n     */\n    inferFromAipVerbs?: boolean;\n    /** Called on every refusal. A host should log this; the dev overlay shows it. */\n    onDenied?(denial: AdmissionDenial): void;\n}"
+          },
+          {
+            "name": "RpcInvoker",
+            "description": "Host-supplied transport. Mirrors the Rust RpcInvoker trait.",
+            "signature": "interface RpcInvoker {\n    invoke(service: string, method: string, request: object): Promise<object>;\n}"
+          },
+          {
+            "name": "RpcTier",
+            "description": "Which callsite tier a call is being fired from. Set by the renderer.",
+            "signature": "type RpcTier = \"read\" | \"mutation\";"
+          },
+          {
+            "name": "StatComputed",
+            "description": "",
+            "signature": "interface StatComputed {\n    /** The formatted value + unit suffix (e.g. \"1,234 employees\", \"87.5%\"). */\n    formattedValue: string;\n    /** Computed (or overridden) trend direction; \"none\" when there is no delta. */\n    trend: StatTrend;\n    /** Formatted signed delta (e.g. \"+30\", \"-5.0%\"), or null when there is none. */\n    formattedDelta: string | null;\n    /** good/bad ONLY when higher_is_better is set; otherwise neutral. */\n    semantics: StatSemantics;\n    /** The series (oldest→newest) driving an optional sparkline; [] when <2 points. */\n    series: number[];\n}"
+          },
+          {
+            "name": "StatSemantics",
+            "description": "",
+            "signature": "type StatSemantics = \"good\" | \"bad\" | \"neutral\";"
+          },
+          {
+            "name": "statSparklinePoints",
+            "description": "SVG `<polyline>` points for a sparkline over a width×height box (y-inverted so\nhigher = up). One geometry impl shared by every web kit (html / shadcn / mui /\nweb-components) — drawn by hand, no chart library. \"\" when < 2 points.",
+            "signature": "function statSparklinePoints(series: number[], width?: number, height?: number): string;"
+          },
+          {
+            "name": "StatTrend",
+            "description": "",
+            "signature": "type StatTrend = \"up\" | \"down\" | \"flat\" | \"none\";"
+          },
+          {
+            "name": "StreamInvoker",
+            "description": "Host-supplied transport for SERVER-STREAMING methods — the streaming peer of\n`RpcInvoker`, and what a `StreamPanel` renders through.\n\nMeridian names the intent (subscribe to this method, with this request); the\nhost owns the wire. A host may back this with server-sent events, a WebSocket,\na gRPC stream, or a poll loop, and the same descriptor renders either way.\n\n`onFrame` receives one streamed frame — a string when the host's transport\nyields bare text, an object when it yields structured envelopes\n(`StreamPanel.line_field` selects the text out of the latter). `onError` is\nterminal for that subscription; a host that reconnects internally simply never\ncalls it. A renderer that receives no invoker degrades per the StreamPanel\nladder (a bounded snapshot, else the placeholder) — it never blanks.",
+            "signature": "interface StreamInvoker {\n    subscribe(service: string, method: string, request: object, handlers: {\n        onFrame(frame: string | object): void;\n        onError?(err: Error): void;\n        onClose?(): void;\n    }): StreamSubscription;\n}"
+          },
+          {
+            "name": "StreamSubscription",
+            "description": "Handle onto a live subscription. Idempotent: closing twice is not an error.",
+            "signature": "interface StreamSubscription {\n    close(): void;\n}"
+          },
+          {
+            "name": "trendArrow",
+            "description": "The arrow glyph for a trend (shared so web + tui match).",
+            "signature": "function trendArrow(trend: StatTrend): string;"
+          },
+          {
+            "name": "WebRenderer",
+            "description": "The seam. Implementations consume the same PanelDescriptor + Theme and differ\nonly in how they paint the DOM. See `webComponentsRenderer`\n(./web_components_renderer.ts) for the reference (React-free) implementation.",
+            "signature": "interface WebRenderer<TTheme = Theme, TFactory = AdhocDomFactory> {\n    /** Stable id for the impl, e.g. \"web-components\" / \"react-mui\". */\n    readonly id: string;\n    /** Mount one panel into `container`; returns a handle to update / unmount it. */\n    mount(opts: MountOptions<TTheme, TFactory>): PanelHandle | Promise<PanelHandle>;\n}"
+          }
+        ]
+      },
+      {
+        "specifier": "@savvifi/meridian-schemas/uiview",
+        "exports": [
+          {
+            "name": "AdhocDomFactory",
+            "description": "The web-components reference impl's adhoc-handler factory shape.",
+            "signature": "type AdhocDomFactory = (container: HTMLElement, descriptor: PanelDescriptor) => void;"
+          },
+          {
+            "name": "AdhocRegistry",
+            "description": "Impl-specific AdhocPanel handler registry: `handler_id` -> a factory. The\nfactory type is impl-specific (DOM nodes for web-components, React elements\nfor the React adapter), so it is a type parameter.",
+            "signature": "type AdhocRegistry<TFactory = AdhocDomFactory> = Record<string, TFactory>;"
+          },
+          {
+            "name": "AdmissionDenial",
+            "description": "Why a call was refused. Passed to {@link RpcAdmission.onDenied}.",
+            "signature": "interface AdmissionDenial {\n    tier: RpcTier;\n    service: string;\n    method: string;\n    /** Human-readable cause, already suitable for a log line or an overlay. */\n    reason: string;\n}"
+          },
+          {
+            "name": "AdmissionDeniedError",
+            "description": "Thrown when a call is refused. Renderers surface it; they never swallow it.",
+            "signature": "class AdmissionDeniedError extends Error {\n    readonly denial: AdmissionDenial;\n    constructor(denial: AdmissionDenial);\n}"
+          },
+          {
+            "name": "AdmissionGate",
+            "description": "A prepared policy. Build once per mount; consult before every invoke.",
+            "signature": "interface AdmissionGate {\n    /** Non-throwing test — for rendering an action as disabled rather than dead. */\n    admits(tier: RpcTier, service: string, method: string): boolean;\n    /** Throws {@link AdmissionDeniedError} unless the call is admitted. */\n    check(tier: RpcTier, service: string, method: string): void;\n}"
+          },
+          {
+            "name": "AdmissionPolicy",
+            "description": "`\"unrestricted\"` disables admission entirely. It exists so that opting out is\nexplicit and greppable rather than accidental — a host that genuinely renders\nonly first-party descriptors can say so in one word, and a reviewer can find\nevery such host with one search.",
+            "signature": "type AdmissionPolicy = RpcAdmission | \"unrestricted\";"
+          },
+          {
+            "name": "aipTier",
+            "description": "The tier an AIP standard-method name implies, or `null` when the name follows\nno standard verb (a custom method — we have nothing to say about it).\n\n`Batch` is a modifier, not a verb: BatchGet reads, BatchDelete mutates, so it\nis stripped and the remainder classified.",
+            "signature": "function aipTier(method: string): RpcTier | null;"
+          },
+          {
+            "name": "computeStat",
+            "description": "Compute a StatPanel's value/delta/trend/semantics — the parity-critical core.",
+            "signature": "function computeStat(panel: StatPanel): StatComputed;"
+          },
+          {
+            "name": "createAdmissionGate",
+            "description": "Build a gate from a host policy.\n\nWith NO policy the gate allows reads and denies mutations. That is a\nbehaviour change for hosts whose actions dial today — deliberately, and at\nthe 1.0.0 boundary, because the alternative is a default that silently\nforwards model-chosen request bodies to an authenticated backend. The denial\nmessage names the exact entry to add.",
+            "signature": "function createAdmissionGate(policy?: AdmissionPolicy): AdmissionGate;"
+          },
+          {
+            "name": "formatStatNumber",
+            "description": "Format a raw number per a ValueFormat enum value. Deterministic.",
+            "signature": "function formatStatNumber(n: number, format: number): string;"
+          },
+          {
+            "name": "GrammarHandle",
+            "description": "A live handle a host MAY return from {@link MountOptions.renderGrammar} for an\ninteractive grammar (chiefly Vega). `element`/`node` is what the renderer\nmounts; `dispose` frees the runtime on unmount. `getSignal`/`onSignal` expose\nthe grammar's named signals (Vega params/selections) so the framework can\nresolve a `signal` FieldBinding (rpc.proto) — a chart selection thus populates\nan RpcCall request and fires through the RpcInvoker, exactly like a Table\nrow-action pulls from the selected row. No bespoke event bus. A plain node\nreturn is equally valid (the simpler, non-signal form). Interaction is a second\ncapability dimension: a surface that can't do it degrades to a static snapshot\n(no live signals → a signal-bound call is inert), never losing content.",
+            "signature": "interface GrammarHandle {\n    /** The node to mount — HTMLElement (web-components) or ReactNode (React). */\n    element?: unknown;\n    /** Alias of `element` for React-flavored hosts. */\n    node?: unknown;\n    /** Cleanup on unmount / re-render (dispose the chart view + listeners). */\n    dispose?(): void;\n    /** Read a named signal's current value — resolves a `signal` FieldBinding. */\n    getSignal?(name: string): unknown;\n    /** Subscribe to a named signal; the framework re-fires signal-bound RpcCalls. */\n    onSignal?(name: string, cb: (value: unknown) => void): void;\n}"
+          },
+          {
+            "name": "MountOptions",
+            "description": "Everything a web renderer needs to mount one panel.",
+            "signature": "interface MountOptions<TTheme = Theme, TFactory = AdhocDomFactory> {\n    /** DOM node the renderer draws into. The renderer owns the subtree. */\n    container: HTMLElement;\n    /** The panel to render (meridian.ui.v1.PanelDescriptor). */\n    descriptor: PanelDescriptor;\n    /** Host transport for the populate / action RPCs. */\n    invoker: RpcInvoker;\n    /**\n     * Host policy for WHICH service/method this descriptor may dial through\n     * {@link invoker}, and at which tier. The access-control peer of the other\n     * host seams here: `renderIcon` / `resolveHref` / `renderGrammar` let the\n     * host decide how a descriptor's intent is realised; `admission` lets it\n     * decide whether that intent is permitted at all.\n     *\n     * This matters because a descriptor is data, and data now arrives from\n     * places that are not the application author — meridian-mcp accepts a\n     * model-authored ViewDescriptor and validates its SHAPE, not what it points\n     * at, while a host's invoker may carry an authenticated session.\n     *\n     * OMITTED ⇒ reads (populate) are allowed and mutations (Action.call, form\n     * submit, LRO start) are DENIED, with an error naming the entry to add.\n     * Pass `\"unrestricted\"` to opt out explicitly. See ./admission.ts.\n     */\n    admission?: AdmissionPolicy;\n    /**\n     * Host transport for SERVER-STREAMING methods — what a StreamPanel subscribes\n     * through. Optional and separate from {@link invoker} because streaming is a\n     * surface CAPABILITY, not a given: a host that cannot stream simply omits it\n     * and StreamPanel degrades down its ladder (a bounded snapshot, else the\n     * placeholder). See stream.proto.\n     */\n    streamInvoker?: StreamInvoker;\n    /** Active theme/skin (meridian.theme.v1). Each impl binds it natively. */\n    theme?: TTheme;\n    /** Runtime context (active resource path, identity, form values). */\n    context?: RenderContext;\n    /** Bespoke (AdhocPanel) handlers keyed by `handler_id`. */\n    adhoc?: AdhocRegistry<TFactory>;\n    /**\n     * Host glyph resolver: maps an `icon` KEY (ChoiceOption.icon, Affordance.icon,\n     * ConnectTarget.icon, CatalogItem.icon — brand-neutral keys the descriptor\n     * carries, e.g. \"github\", \"download\") to a renderer-native glyph. The\n     * \"renderer draws, host wires\" icon seam: the descriptor names the icon, the\n     * host supplies the vector. Return type is renderer-specific (a ReactNode for\n     * the React adapter, an HTMLElement for the web-components renderer), so it is\n     * loosely typed here. Absent ⇒ renderers emit the key as a `data-icon`\n     * attribute (never dropped) and draw no glyph.\n     */\n    renderIcon?: (key: string) => unknown;\n    /**\n     * Host route resolver — the LINK peer of the icon / grammar host seams, named\n     * by `ColumnLink` (table.proto) which says the renderer \"never builds a URL\n     * itself: it hands the host the target kind + the cell's value (the entity's\n     * id) and the host maps that to its own route\".\n     *\n     * Meridian stays URL-agnostic; hosts own routes. Return a URL to draw the cell\n     * as a link, or `null`/nothing to draw plain text — a renderer must never emit\n     * a dead link. `targetKind` is empty for a self/detail link, in which case the\n     * view's own `subject_kind` applies. `row` is the full source row, so a host\n     * that needs more than the id (a tenant, a repo) can read it.\n     */\n    resolveHref?: (opts: {\n        targetKind: string;\n        id: string;\n        row?: object;\n    }) => string | null | undefined;\n    /**\n     * Host transcoder for a GrammarPanel — a declarative grammar (markdown /\n     * mermaid / plantuml / graphviz / vega). This is the surface's capability set:\n     * the host wires it ONLY for languages this surface can display, returning a\n     * live result for those, or `null`/nothing for the rest → the renderer degrades\n     * down the ladder (native markdown → `alt` → source text). Kits import no\n     * grammar library.\n     *\n     * The return is a LIVE result, not just markup: a renderer-native node\n     * (HTMLElement for web-components, ReactNode for React) that is already\n     * interactive once mounted (vega-embed tooltips / zoom / brush \"just work\"), OR\n     * a {@link GrammarHandle} whose `element`/`node` is mounted and whose optional\n     * `dispose` frees the runtime, and whose `getSignal`/`onSignal` expose the\n     * grammar's live selections to the FRAMEWORK — which resolves them the\n     * meridian-idiomatic way (a `signal` FieldBinding source, rpc.proto) so an\n     * interactive selection fires an RpcCall through the RpcInvoker like every\n     * other panel action. A plain node return is equally valid. Loosely typed\n     * (renderer-specific); `data` is the decoded google.protobuf.Struct.\n     */\n    renderGrammar?: (opts: {\n        language: string;\n        source: string;\n        data?: unknown;\n    }) => unknown;\n}"
+          },
+          {
+            "name": "PanelHandle",
+            "description": "A handle to one mounted panel, returned by {@link WebRenderer.mount}.",
+            "signature": "interface PanelHandle {\n    /** Re-render in place with a new descriptor (same container + transport). */\n    update(descriptor: PanelDescriptor): void | Promise<void>;\n    /** Tear the panel down and release listeners / resources. */\n    unmount(): void;\n}"
+          },
+          {
+            "name": "RenderContext",
+            "description": "Context the renderer/host expects when building requests.",
+            "signature": "interface RenderContext {\n    currentResourcePath: string | null;\n    uiIdentity: object | null;\n    selectedRow: object | null;\n    formValues: Record<string, unknown>;\n}"
+          },
+          {
+            "name": "RpcAdmission",
+            "description": "What a descriptor is allowed to dial, declared by the HOST.\n\nEntries are `\"<fully.qualified.Service>/<Method>\"`, with `*` accepted as the\nmethod (`\"acme.v1.Orders/*\"`, the whole service) or as the entire entry\n(`\"*\"`, everything at that tier). Matching is exact and case-sensitive\notherwise — a service name is a proto identifier, not a URL.",
+            "signature": "interface RpcAdmission {\n    /**\n     * Methods reachable from a read callsite. OMITTED means \"any\", which is what\n     * every host does today: populate already fires freely, so defaulting reads\n     * closed would break every existing consumer on upgrade without closing the\n     * hole this module exists for.\n     */\n    reads?: readonly string[];\n    /**\n     * Methods reachable from a mutation callsite. OMITTED means NONE — the\n     * deliberate default, and the reason this module exists. A host that wants\n     * actions to dial must say which ones.\n     */\n    mutations?: readonly string[];\n    /**\n     * Deny a read-tier call whose AIP verb says it mutates (Create / Update /\n     * Patch / Delete), even when `reads` would otherwise admit it. Defaults to\n     * TRUE: this is a tripwire, never a grant — it can only ever refuse, and it\n     * refuses exactly the shape that matters, a destructive call smuggled into a\n     * populate slot where it auto-fires on mount with no user gesture.\n     */\n    inferFromAipVerbs?: boolean;\n    /** Called on every refusal. A host should log this; the dev overlay shows it. */\n    onDenied?(denial: AdmissionDenial): void;\n}"
+          },
+          {
+            "name": "RpcInvoker",
+            "description": "Host-supplied transport. Mirrors the Rust RpcInvoker trait.",
+            "signature": "interface RpcInvoker {\n    invoke(service: string, method: string, request: object): Promise<object>;\n}"
+          },
+          {
+            "name": "RpcTier",
+            "description": "Which callsite tier a call is being fired from. Set by the renderer.",
+            "signature": "type RpcTier = \"read\" | \"mutation\";"
+          },
+          {
+            "name": "StatComputed",
+            "description": "",
+            "signature": "interface StatComputed {\n    /** The formatted value + unit suffix (e.g. \"1,234 employees\", \"87.5%\"). */\n    formattedValue: string;\n    /** Computed (or overridden) trend direction; \"none\" when there is no delta. */\n    trend: StatTrend;\n    /** Formatted signed delta (e.g. \"+30\", \"-5.0%\"), or null when there is none. */\n    formattedDelta: string | null;\n    /** good/bad ONLY when higher_is_better is set; otherwise neutral. */\n    semantics: StatSemantics;\n    /** The series (oldest→newest) driving an optional sparkline; [] when <2 points. */\n    series: number[];\n}"
+          },
+          {
+            "name": "StatSemantics",
+            "description": "",
+            "signature": "type StatSemantics = \"good\" | \"bad\" | \"neutral\";"
+          },
+          {
+            "name": "statSparklinePoints",
+            "description": "SVG `<polyline>` points for a sparkline over a width×height box (y-inverted so\nhigher = up). One geometry impl shared by every web kit (html / shadcn / mui /\nweb-components) — drawn by hand, no chart library. \"\" when < 2 points.",
+            "signature": "function statSparklinePoints(series: number[], width?: number, height?: number): string;"
+          },
+          {
+            "name": "StatTrend",
+            "description": "",
+            "signature": "type StatTrend = \"up\" | \"down\" | \"flat\" | \"none\";"
+          },
+          {
+            "name": "StreamInvoker",
+            "description": "Host-supplied transport for SERVER-STREAMING methods — the streaming peer of\n`RpcInvoker`, and what a `StreamPanel` renders through.\n\nMeridian names the intent (subscribe to this method, with this request); the\nhost owns the wire. A host may back this with server-sent events, a WebSocket,\na gRPC stream, or a poll loop, and the same descriptor renders either way.\n\n`onFrame` receives one streamed frame — a string when the host's transport\nyields bare text, an object when it yields structured envelopes\n(`StreamPanel.line_field` selects the text out of the latter). `onError` is\nterminal for that subscription; a host that reconnects internally simply never\ncalls it. A renderer that receives no invoker degrades per the StreamPanel\nladder (a bounded snapshot, else the placeholder) — it never blanks.",
+            "signature": "interface StreamInvoker {\n    subscribe(service: string, method: string, request: object, handlers: {\n        onFrame(frame: string | object): void;\n        onError?(err: Error): void;\n        onClose?(): void;\n    }): StreamSubscription;\n}"
+          },
+          {
+            "name": "StreamSubscription",
+            "description": "Handle onto a live subscription. Idempotent: closing twice is not an error.",
+            "signature": "interface StreamSubscription {\n    close(): void;\n}"
+          },
+          {
+            "name": "trendArrow",
+            "description": "The arrow glyph for a trend (shared so web + tui match).",
+            "signature": "function trendArrow(trend: StatTrend): string;"
+          },
+          {
+            "name": "WebRenderer",
+            "description": "The seam. Implementations consume the same PanelDescriptor + Theme and differ\nonly in how they paint the DOM. See `webComponentsRenderer`\n(./web_components_renderer.ts) for the reference (React-free) implementation.",
+            "signature": "interface WebRenderer<TTheme = Theme, TFactory = AdhocDomFactory> {\n    /** Stable id for the impl, e.g. \"web-components\" / \"react-mui\". */\n    readonly id: string;\n    /** Mount one panel into `container`; returns a handle to update / unmount it. */\n    mount(opts: MountOptions<TTheme, TFactory>): PanelHandle | Promise<PanelHandle>;\n}"
+          }
+        ]
+      }
+    ],
+    "modulePatterns": []
+  }
+]

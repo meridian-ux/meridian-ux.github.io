@@ -94,3 +94,28 @@ a `public/CNAME`. If you ever reintroduce a `base`, note that
 `src/styles/global.css` references fonts by absolute `url()` and cannot read
 `import.meta.env.BASE_URL` — the prefix has to be threaded through the CSS by
 hand, which is why the old `/site` prefix was hardcoded in 28 places.
+
+## Generated library references
+
+The Astro site renders checked-in API snapshots from the same published
+`0.25.1` npm packages used by the web quickstart. Each library page
+uses the same declaration component. The React page additionally groups the
+components, provider contracts, hooks, kits, and kit slots.
+
+Regenerate from the site root. Use an external tools directory so these
+dependencies do not change the site lockfile.
+
+```sh
+tools_dir=$(mktemp -d)
+npm install --prefix "$tools_dir" --no-save --ignore-scripts --legacy-peer-deps \
+  typescript@5.6.2 \
+  @savvifi/meridian-web-react@0.25.1 @savvifi/meridian-mui-kit@0.25.1 \
+  @savvifi/meridian-chat@0.25.1 @savvifi/meridian-launchpad@0.25.1 \
+  @savvifi/meridian-proto-ts@0.25.1 @savvifi/meridian-schemas@0.25.1
+node tools/gen-react-reference.mjs "$tools_dir/node_modules"
+node tools/gen-library-references.mjs "$tools_dir/node_modules"
+```
+
+Pass `--check` as the final argument to either generator to verify that its
+checked-in snapshot matches the installed declarations. Update the quickstart pins
+and generation inputs together when changing the documented SDK version.

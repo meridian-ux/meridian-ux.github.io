@@ -1,0 +1,16 @@
+---
+import Guide from "../../layouts/Guide.astro";
+import references from "../../content/library-references.json";
+---
+<Guide title="Library references" description="Browse the generated public API for the Meridian npm packages.">
+  <ul class="libraries">
+    <li><a href="/start/web/react/">React renderer</a></li>
+    {references.map(library => <li><a href={`/reference/${library.slug}/`}>{library.title}</a></li>)}
+  </ul>
+  <h2>Platform integration</h2>
+  <p><a href="/start/terminal/">Terminal</a> · <a href="/start/swiftui/">SwiftUI</a> · <a href="/start/wasm/">Web Components and WASM</a></p>
+</Guide>
+<style>
+  .libraries { padding-inline-start: 20px; }
+  li + li { margin-top: 8px; }
+</style>

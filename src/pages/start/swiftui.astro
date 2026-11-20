@@ -1,0 +1,19 @@
+---
+import { Code } from "astro:components";
+import Guide from "../../layouts/Guide.astro";
+---
+<Guide title="Get started with SwiftUI" description="Build the native Meridian renderer preview for macOS and iOS from source.">
+  <h2>Prepare the Swift package</h2>
+  <p>Use macOS with Xcode 26.2 or later, Swift 6.2 or later, stable Rust, Node.js 22, the repository’s pinned pnpm version, and Python 3. The preparer generates Swift protobuf bindings and builds the Rust XCFramework.</p>
+  <Code lang="bash" wrap code={`git clone https://github.com/meridian-ux/meridian.git
+cd meridian
+pnpm install --frozen-lockfile --ignore-scripts
+rustup target add aarch64-apple-darwin x86_64-apple-darwin \\
+  aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios-sim
+python3 tools/swiftui.py
+swift test`} />
+  <p>Run <code>python3 tools/swiftui.py --ios</code> to check the iOS device and simulator builds.</p>
+  <h2>Mount a panel</h2>
+  <p>From a main-actor SwiftUI host, retain a <code>MeridianHost</code> across view updates. Pass a decoded <code>PanelDescriptor</code> and the host to <code>MeridianPanel</code>. The default host can render static content. For live requests, supply the transport and admission policy.</p>
+  <p><a href="https://github.com/meridian-ux/meridian/tree/main/packages/swiftui">SwiftUI host API and preview limitations</a></p>
+</Guide>

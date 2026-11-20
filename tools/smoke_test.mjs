@@ -71,7 +71,7 @@ const features = catalog
 if (!catalog) fail("src/content/features.json not found — cannot derive feature routes");
 else if (features.length === 0) fail("features.json lists no features — the catalog is empty");
 
-const ROUTES = ["", "features", "conformance", "brand", ...features.map((f) => `features/${f.slug}`)];
+const ROUTES = ["", "features", "conformance", "brand", "start", "start/web", "start/web/react", "start/swiftui", "start/terminal", "start/wasm", ...features.map((f) => `features/${f.slug}`)];
 const before = fails;
 for (const r of ROUTES) {
   const f = join(DIST, r, "index.html");

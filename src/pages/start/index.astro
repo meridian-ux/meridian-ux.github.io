@@ -1,0 +1,18 @@
+---
+import Base from "../../layouts/Base.astro";
+import PlatformLinks from "../../components/PlatformLinks.astro";
+---
+<Base title="Get started — Meridian" description="Choose a platform and render your first Meridian descriptor.">
+  <section class="start-index">
+    <h1>Get started</h1>
+    <p>Choose the surface where you want to render a Meridian descriptor.</p>
+    <PlatformLinks />
+    <p><a href="/reference/">Library API references →</a></p>
+  </section>
+</Base>
+<style>
+  .start-index { padding: clamp(48px, 9vw, 96px) 0; }
+  h1 { font-size: clamp(2.75rem, 7vw, 5rem); line-height: 1.05; letter-spacing: -.055em; margin: 0; }
+  p { color: var(--muted); }
+  p a { color: var(--cream); text-decoration: underline; text-underline-offset: .24em; }
+</style>

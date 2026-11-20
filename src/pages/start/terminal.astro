@@ -1,0 +1,15 @@
+---
+import { Code } from "astro:components";
+import Guide from "../../layouts/Guide.astro";
+---
+<Guide title="Get started in the terminal" description="Run Meridian’s offline viewer with a protobuf descriptor or embed the renderer in a ratatui application.">
+  <h2>Run the offline viewer</h2>
+  <p>Install Rust with Cargo and make sure <code>protoc</code> is on your PATH. Clone the Meridian repository and run the viewer from its root with the included stat descriptor.</p>
+  <Code lang="bash" wrap code={`git clone https://github.com/meridian-ux/meridian.git
+cd meridian
+cargo run --locked -p meridian-tui -- schemas/conformance/binpb/stat.binpb`} />
+  <p>The viewer draws the stat in your terminal. Supply a binary <code>ViewDescriptor</code> and add <code>--view</code> to open a composed view instead.</p>
+  <h2>Embed in a Rust app</h2>
+  <p>Use <code>PanelView</code> to draw a panel in an existing ratatui frame, or <code>ViewHost</code> for a composed view. Your app forwards input events and provides the transport and authorization for live requests.</p>
+  <p><a href="https://github.com/meridian-ux/meridian/tree/main/crates/tui">Terminal renderer source and host API</a> · <a href="/conformance/">Renderer coverage</a></p>
+</Guide>

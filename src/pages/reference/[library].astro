@@ -1,0 +1,29 @@
+---
+import ApiEntry from "../../components/ApiEntry.astro";
+import Guide from "../../layouts/Guide.astro";
+import references from "../../content/library-references.json";
+
+export function getStaticPaths() {
+  return references.map(library => ({ params: { library: library.slug }, props: { library } }));
+}
+const { library } = Astro.props;
+---
+<Guide title={`${library.title} API reference`} description="Exports and signatures from the published TypeScript declarations.">
+  <p><code>{library.package}@{library.version}</code> · <a href="/reference/">All library references</a></p>
+  {library.entrypoints.map((entry, index) => (
+    <section id={`module-${index}`}>
+      <h2><code>{entry.specifier}</code></h2>
+      {entry.exports.map(api => <ApiEntry id={`module-${index}-${api.name}`} {...api} />)}
+    </section>
+  ))}
+  {library.modulePatterns.map(pattern => (
+    <details class="modules">
+      <summary><code>{pattern.specifier}</code> modules</summary>
+      <ul>{pattern.modules.map(module => <li><code>{module}</code></li>)}</ul>
+    </details>
+  ))}
+</Guide>
+<style>
+  .modules { margin-top: 24px; }
+  summary { cursor: pointer; }
+</style>

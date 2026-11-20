@@ -1,0 +1,27 @@
+---
+import { Code } from "astro:components";
+import Guide from "../../layouts/Guide.astro";
+import Quickstart from "../../components/Quickstart.astro";
+---
+<Guide title="Get started on the web" description="Render a typed descriptor in React, choose a component kit, and connect the renderer to your app.">
+  <p><a href="#quickstart">Run the example</a> · <a href="/start/web/react/">React API reference</a> · <a href="/start/wasm/">Web Components and WASM</a></p>
+
+  <h2 id="descriptors">Descriptors</h2>
+  <p>A <code>PanelDescriptor</code> declares one panel. Its body selects a shape such as a table, form, or stat. A <code>ViewDescriptor</code> arranges panels into sections and can compose nested views. Decode the Protobuf JSON before passing a panel to <code>PanelRenderer</code> or a view to <code>ViewRenderer</code>.</p>
+
+  <h2 id="provider">Provider</h2>
+  <p>Wrap the part of your React app that renders descriptors in <code>MeridianProvider</code>. The provider supplies the kit, optional theme, RPC invoker, and a registry of app-specific panel handlers. Descendant renderers and kit components read those settings through React context.</p>
+  <p>For a static panel, provide an invoker that rejects calls. For live data, route supported calls through your app’s authenticated client and enforce authorization in the host. Add optional icon, link, and diagram resolvers where your app supports them.</p>
+
+  <h2 id="kits">Component kits</h2>
+  <p>A kit maps descriptor shapes to React components. For example, a stat panel goes to the kit’s <code>Stat</code> component. The HTML and shadcn kits are exported by the React package. A separate MUI kit integrates Material UI and provides its own wrapper.</p>
+  <p>Start with the HTML kit and replace an individual slot to customize its rendering. The kit receives the decoded panel and its parent descriptor. Unsupported optional slots fall back to the kit’s <code>Fallback</code> component.</p>
+  <Code lang="jsx" wrap code={`function MyStat({ panel }) {
+  return <p>{panel.label}: {panel.value}</p>;
+}
+
+const kit = { ...htmlKit, id: "my-app", Stat: MyStat };`} />
+  <p>Pass <code>kit</code> to the provider. This example uses the authored stat value. Use the kit’s existing stat component when you need formatting or live population. See the <a href="/start/web/react/#kit-slots">generated slot reference</a> for signatures and supported extensions.</p>
+
+  <Quickstart />
+</Guide>

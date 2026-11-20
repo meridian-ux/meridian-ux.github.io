@@ -18,6 +18,7 @@ if (hero.accent_span && hero.headline && hero.headline.includes(hero.accent_span
   accent = hero.accent_span;
   post = hero.headline.slice(i + hero.accent_span.length);
 }
+const guide = { web: "/start/web/", swiftui: "/start/swiftui/", tui: "/start/terminal/", wasm: "/start/wasm/" }[f.slug];
 const statusClass = (f.status || "available").toLowerCase();
 const canonical = meta.canonical || new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = meta.og_image || (meta.og_generate ? `/assets/og/${f.slug}.png` : "/assets/og/default.png");
@@ -88,7 +89,8 @@ const jsonLd = {
   <section class="close">
     <h2>Explore Meridian</h2>
     <div class="cta-row">
-      <a class="btn btn-primary" href="/conformance/">Check renderer coverage</a>
+      <a class="btn btn-primary" href={guide}>Read the setup guide</a>
+      <a class="btn btn-plain" href="/conformance/">Check renderer coverage</a>
       <a class="btn btn-plain" href="/features/">All renderers →</a>
     </div>
   </section>

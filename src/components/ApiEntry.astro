@@ -1,0 +1,14 @@
+---
+import { Code } from "astro:components";
+const { id, name, signature, description, qualifier } = Astro.props;
+---
+<details id={id}>
+  <summary><code>{name}</code>{qualifier && <span>{qualifier}</span>}</summary>
+  {description && <p>{description}</p>}
+  {signature ? <Code lang="typescript" wrap code={signature} /> : <p>Re-exported from a dependency.</p>}
+</details>
+<style>
+  details { border-top: 1px solid var(--line); padding: 8px 0; }
+  summary { cursor: pointer; }
+  summary span { color: var(--muted); font-size: .85rem; margin-inline-start: .5rem; }
+</style>

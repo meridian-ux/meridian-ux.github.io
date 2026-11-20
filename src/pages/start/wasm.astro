@@ -1,0 +1,15 @@
+---
+import { Code } from "astro:components";
+import Guide from "../../layouts/Guide.astro";
+---
+<Guide title="Get started with WebAssembly" description="Build Meridian’s shared Rust runtime and wire it into a browser host.">
+  <h2>Build the shared core</h2>
+  <p>Clone the source and run the workspace’s core preparation target with its pinned pnpm and Bazel toolchains. This prepares the bundled core used by the TypeScript SDK.</p>
+  <Code lang="bash" wrap code={`git clone https://github.com/meridian-ux/meridian.git
+cd meridian
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm core:prepare`} />
+  <h2>Integrate with Web Components</h2>
+  <p>For a Web Components host, build the browser-target WASM bindings and initialize them before passing them to <code>webComponentsRenderer(wasm)</code>. The renderer mounts a descriptor in the DOM. The Rust runtime supplies shared formatting, validation, and request assembly. Your host owns transport and authorization.</p>
+  <p><a href="https://github.com/meridian-ux/meridian/tree/main/packages/web">Web Components setup and host API</a> · <a href="https://github.com/meridian-ux/meridian/tree/main/crates/core/rust/uiview">Rust core source</a> · <a href="/start/web/">React quickstart</a></p>
+</Guide>

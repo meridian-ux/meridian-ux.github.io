@@ -1,0 +1,279 @@
+{
+  "package": "@savvifi/meridian-web-react",
+  "version": "0.25.1",
+  "groups": {
+    "components": [
+      {
+        "name": "FormFieldRow",
+        "description": "Renders a single FormField (any kind: scalar / nested / repeated).\n`pathPrefix` is the dot-separated parent path; `field.requestField` is appended\nto build the leaf name attribute (e.g. `groups[0].label`).",
+        "signature": "function FormFieldRow({ c, field, mode, pathPrefix, }: {\n    c: FormFieldClasses;\n    field: FormField;\n    mode: number;\n    /** Dot-separated ancestor path, e.g. \"groups[0]\". Absent at the top level. */\n    pathPrefix?: string;\n}): ReactNode;"
+      },
+      {
+        "name": "MeridianProvider",
+        "description": "",
+        "signature": "function MeridianProvider({ children, ...value }: MeridianProviderProps): ReactNode;"
+      },
+      {
+        "name": "NestedFormFields",
+        "description": "Renders a NestedForm's fields inside a nested container (recursive).",
+        "signature": "function NestedFormFields({ c, nested, mode, pathPrefix, }: {\n    c: FormFieldClasses;\n    nested: NestedForm;\n    mode: number;\n    pathPrefix: string;\n}): ReactNode;"
+      },
+      {
+        "name": "PanelRenderer",
+        "description": "",
+        "signature": "function PanelRenderer({ descriptor, }: {\n    descriptor: PanelDescriptor;\n}): ReactNode;"
+      },
+      {
+        "name": "RepeatedFieldControl",
+        "description": "Stateful repeated-field widget: ordered list of rows with Add / Remove /\nMove-up / Move-down controls. Controls are hidden in read-only mode\n(mode !== EDIT). Enforces min_items / max_items.\n\nSerialization: each row's inputs carry bracket-indexed names\n(`namePath[i]` for scalar, `namePath[i].subField` for nested). A\n`<input type=\"hidden\">` at the end of the list carries the JSON-encoded\ncurrent row count so a FormData collector can detect empty arrays.",
+        "signature": "function RepeatedFieldControl({ c, spec, mode, namePath, }: {\n    c: FormFieldClasses;\n    spec: RepeatedField;\n    mode: number;\n    namePath: string;\n}): ReactNode;"
+      },
+      {
+        "name": "ViewRenderer",
+        "description": "Renders a ViewDescriptor. The layout mode selects the arrangement of slots.\n`initialData` (optional) is a server-computed page-0 seed keyed by each table\npopulate's `${service}.${method}`; when present, usePagedRows renders those rows\non the first paint (SSR) and skips the initial client refetch on hydration.",
+        "signature": "function ViewRenderer({ view, initialData, selection, }: {\n    view: ViewDescriptor;\n    initialData?: MeridianInitialData;\n    /**\n     * Host-owned selection bag. Supply it when the host wants to OWN the scope —\n     * URL-sync it (`?planYear=123`, shareable + back/forward), persist it, or SEED\n     * it server-side so scope-bound panels can SSR at all. Absent ⇒ the view keeps\n     * its own state, so kits, tests and the CRD path work standalone.\n     */\n    selection?: MeridianSelection;\n}): ReactNode;"
+      }
+    ],
+    "contracts": [
+      {
+        "name": "ActionBarProps",
+        "description": "Props for a kit's action bar: the actions to render + transport to fire them.",
+        "signature": "interface ActionBarProps {\n    actions: Action[];\n    invoker: RpcInvoker;\n}"
+      },
+      {
+        "name": "MeridianContextValue",
+        "description": "",
+        "signature": "interface MeridianContextValue {\n    theme?: Theme;\n    invoker: RpcInvoker;\n    kit: ComponentKit;\n    adhoc: Record<string, ReactAdhocFactory>;\n    /** Optional host handler for no-call actions (nav/custom). Absent ⇒ no-op. */\n    onAction?: MeridianActionHandler;\n    /** Optional host glyph resolver for `icon` keys. Absent ⇒ no glyph drawn. */\n    renderIcon?: MeridianIconResolver;\n    /** Optional host transcoder for GrammarPanel. Absent/null ⇒ degradation ladder. */\n    renderGrammar?: MeridianGrammarResolver;\n    /** Optional host resolver for a table cell's link destination (ColumnLink).\n     *  Absent ⇒ link cells render as plain text. */\n    resolveHref?: MeridianHrefResolver;\n}"
+      },
+      {
+        "name": "MeridianProviderProps",
+        "description": "",
+        "signature": "interface MeridianProviderProps extends MeridianContextValue {\n    children: ReactNode;\n}"
+      },
+      {
+        "name": "ShapeProps",
+        "description": "Props every shape component receives: its panel, the parent descriptor, transport.",
+        "signature": "interface ShapeProps<P> {\n    panel: P;\n    descriptor: PanelDescriptor;\n    invoker: RpcInvoker;\n}"
+      }
+    ],
+    "kits": [
+      {
+        "name": "htmlKit",
+        "description": "",
+        "signature": "const htmlKit: ComponentKit;"
+      },
+      {
+        "name": "reactWebRenderer",
+        "description": "",
+        "signature": "function reactWebRenderer(kit: ComponentKit): WebRenderer<Theme, ReactAdhocFactory>;"
+      },
+      {
+        "name": "shadcnKit",
+        "description": "",
+        "signature": "const shadcnKit: ComponentKit;"
+      }
+    ],
+    "hooks": [
+      {
+        "name": "useActionHandler",
+        "description": "",
+        "signature": "const useActionHandler: () => MeridianActionHandler | undefined;"
+      },
+      {
+        "name": "useAdhocHandler",
+        "description": "",
+        "signature": "const useAdhocHandler: (handlerId: string) => ReactAdhocFactory | undefined;"
+      },
+      {
+        "name": "useComponentKit",
+        "description": "",
+        "signature": "const useComponentKit: () => ComponentKit;"
+      },
+      {
+        "name": "useGrammarResolver",
+        "description": "The host's GrammarPanel transcoder (or undefined). GrammarContent tries it,\nthen degrades.",
+        "signature": "const useGrammarResolver: () => MeridianGrammarResolver | undefined;"
+      },
+      {
+        "name": "useHrefResolver",
+        "description": "The host's table-cell link resolver (or undefined). A link column renders\nplain text when absent.",
+        "signature": "const useHrefResolver: () => MeridianHrefResolver | undefined;"
+      },
+      {
+        "name": "useIcon",
+        "description": "Resolve an `icon` key to a host glyph (or null). Components render the result\nbefore a label; they should ALSO set `data-icon={key}` so the key survives\neven when no resolver is wired. Safe to call with an empty/absent key.",
+        "signature": "function useIcon(key: string | undefined): ReactNode;"
+      },
+      {
+        "name": "useMeridian",
+        "description": "",
+        "signature": "function useMeridian(): MeridianContextValue;"
+      },
+      {
+        "name": "useMeridianSelection",
+        "description": "",
+        "signature": "function useMeridianSelection(): MeridianSelection;"
+      },
+      {
+        "name": "useMeridianTheme",
+        "description": "",
+        "signature": "const useMeridianTheme: () => Theme | undefined;"
+      },
+      {
+        "name": "usePagedRows",
+        "description": "Fetch + page a TablePanel's rows through the invoker. CLIENT returns all rows\n(the kit's table paginates locally); OFFSET / CURSOR fetch one page at a time.",
+        "signature": "function usePagedRows(panel: TablePanel, invoker: RpcInvoker): PagedTable;"
+      },
+      {
+        "name": "useRecord",
+        "description": "Fetch the single record a detail panel binds to. The counterpart of\n`usePagedRows` for a one-record view: it invokes `populate` once with the\nrequest field named by `idField` (default \"id\") set to `subjectId`\n(ViewDescriptor.subject_id), and — like the table — consumes an SSR seed from\n`MeridianInitialDataContext` (a record is stored as a one-row page, so the seed\nkey is `${service}.${method}` and the record is `seed.rows[0]`) so the server\npaint carries real values and the client hydrates without an immediate refetch.\nNo `populate` ⇒ inert (undefined record, not loading).",
+        "signature": "function useRecord(populate: RpcCall | undefined, idField: string, subjectId: string | undefined, invoker: RpcInvoker): RecordState;"
+      },
+      {
+        "name": "useRpcInvoker",
+        "description": "",
+        "signature": "const useRpcInvoker: () => RpcInvoker;"
+      }
+    ]
+  },
+  "slots": [
+    {
+      "name": "id",
+      "optional": false,
+      "signature": "readonly id: string;",
+      "description": "Stable id, e.g. \"mui\" / \"shadcn\" / \"html\". Used in the renderer id."
+    },
+    {
+      "name": "themeToStyle",
+      "optional": true,
+      "signature": "themeToStyle?(theme: Theme | undefined): CSSProperties;",
+      "description": "Bind a meridian.theme.v1.Theme to this kit's style primitive (MUI theme,\nCSS custom properties, Tailwind config, …). Returned style is applied to the\npanel container. Optional — a kit may bind the theme its own way."
+    },
+    {
+      "name": "Chrome",
+      "optional": true,
+      "signature": "Chrome?: ComponentType<{\n        descriptor: PanelDescriptor;\n        children: ReactNode;\n    }>;",
+      "description": "Optional wrapper around every panel (title bar, surface, padding)."
+    },
+    {
+      "name": "Table",
+      "optional": false,
+      "signature": "Table: ComponentType<TablePanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "Prompt",
+      "optional": false,
+      "signature": "Prompt: ComponentType<PromptPanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "Lro",
+      "optional": false,
+      "signature": "Lro: ComponentType<LroPanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "Form",
+      "optional": false,
+      "signature": "Form: ComponentType<FormPanelProps>;",
+      "description": "Entity \"detail section\" / CRUD form (FormPanel: READONLY | EDIT)."
+    },
+    {
+      "name": "DetailHeader",
+      "optional": true,
+      "signature": "DetailHeader?: ComponentType<DetailHeaderPanelProps>;",
+      "description": "Detail-view header — a record's title + optional subtitle/status + descriptor\nrows, fetched via the panel's `populate`. PanelRenderer falls back when omitted."
+    },
+    {
+      "name": "RecordCard",
+      "optional": true,
+      "signature": "RecordCard?: ComponentType<RecordCardPanelProps>;",
+      "description": "Read-only key/value record card (the detail \"section\"). PanelRenderer falls\nback when a kit omits it."
+    },
+    {
+      "name": "Gallery",
+      "optional": true,
+      "signature": "Gallery?: ComponentType<GalleryPanelProps>;",
+      "description": "Optional richer shapes; PanelRenderer falls back when a kit omits them."
+    },
+    {
+      "name": "LlmPrompt",
+      "optional": true,
+      "signature": "LlmPrompt?: ComponentType<LlmPromptPanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "Choice",
+      "optional": true,
+      "signature": "Choice?: ComponentType<ChoicePanelProps>;",
+      "description": "Optional content shapes (choice / snippet / action / connect-flow /\ncopy-value / catalog). Static, brand-neutral surfaces; PanelRenderer falls\nback when a kit omits them."
+    },
+    {
+      "name": "Snippet",
+      "optional": true,
+      "signature": "Snippet?: ComponentType<SnippetPanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "Action",
+      "optional": true,
+      "signature": "Action?: ComponentType<ActionPanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "ConnectFlow",
+      "optional": true,
+      "signature": "ConnectFlow?: ComponentType<ConnectFlowPanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "CopyValue",
+      "optional": true,
+      "signature": "CopyValue?: ComponentType<CopyValuePanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "Catalog",
+      "optional": true,
+      "signature": "Catalog?: ComponentType<CatalogPanelProps>;",
+      "description": ""
+    },
+    {
+      "name": "Grammar",
+      "optional": true,
+      "signature": "Grammar?: ComponentType<GrammarPanelProps>;",
+      "description": "GrammarPanel (markdown / mermaid / plantuml / graphviz / vega). Specialized:\nthe rich render is host-wired via renderGrammar; the kit degrades to native\nmarkdown / alt / source. PanelRenderer falls back when a kit omits it."
+    },
+    {
+      "name": "Stat",
+      "optional": true,
+      "signature": "Stat?: ComponentType<StatPanelProps>;",
+      "description": "KPI tile — a labeled number with a COMPUTED delta/trend + sparkline."
+    },
+    {
+      "name": "Steps",
+      "optional": true,
+      "signature": "Steps?: ComponentType<StepsPanelProps>;",
+      "description": "Ordered walkthrough — steps a reader performs, each with an optional\nnarration, frame and actor. The step NUMBER comes from POSITION; Step\ncarries no ordinal, so a kit must never render an authored one."
+    },
+    {
+      "name": "Media",
+      "optional": true,
+      "signature": "Media?: ComponentType<MediaPanelProps>;",
+      "description": "Video / audio / image with a poster, captions and chapters. Specialized:\na moving picture is not displayable as text, so a kit that cannot play it\ndegrades to the poster, then to `alt`. PanelRenderer falls back when a kit\nomits it entirely."
+    },
+    {
+      "name": "Fallback",
+      "optional": false,
+      "signature": "Fallback: ComponentType<{\n        descriptor: PanelDescriptor;\n    }>;",
+      "description": "Rendered for unknown / unset / unsupported shapes."
+    },
+    {
+      "name": "ActionBar",
+      "optional": true,
+      "signature": "ActionBar?: ComponentType<ActionBarProps>;",
+      "description": "Renders a view/slot's actions (ViewDescriptor.actions / Slot.actions).\nOptional — ViewRenderer falls back to plain buttons when a kit omits it."
+    }
+  ]
+}

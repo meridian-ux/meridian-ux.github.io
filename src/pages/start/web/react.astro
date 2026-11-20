@@ -1,0 +1,28 @@
+---
+import ApiEntry from "../../../components/ApiEntry.astro";
+import Guide from "../../../layouts/Guide.astro";
+import reference from "../../../content/react-reference.json";
+
+const labels = { components: "Components", contracts: "Provider and component props", kits: "Kits and adapter", hooks: "Hooks" };
+---
+<Guide title="React API reference" description="Public component, provider, kit, and hook declarations for the package used by the web quickstart.">
+  <p>Generated from <code>{reference.package}@{reference.version}</code>. <a href="/start/web/">Read the web guide</a> · <a href="/reference/">All library references</a></p>
+  <nav class="contents" aria-label="Reference sections">
+    {Object.entries(labels).map(([group, label]) => <a href={`#${group}`}>{label}</a>)}
+    <a href="#kit-slots">Kit slots</a>
+  </nav>
+  {Object.entries(reference.groups).map(([group, entries]) => (
+    <section id={group}>
+      <h2>{labels[group]}</h2>
+      {entries.map(entry => <ApiEntry id={entry.name} {...entry} />)}
+    </section>
+  ))}
+  <section id="kit-slots">
+    <h2>ComponentKit slots</h2>
+    <p>Required members are part of every kit. Optional component slots can be omitted and handled by the renderer’s fallback.</p>
+    {reference.slots.map(slot => <ApiEntry id={`kit-${slot.name}`} name={slot.name} signature={slot.signature} description={slot.description} qualifier={slot.optional ? "Optional" : "Required"} />)}
+  </section>
+</Guide>
+<style>
+  .contents { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+</style>

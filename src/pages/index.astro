@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Gallery from "../components/Gallery.astro";
-import Quickstart from "../components/Quickstart.astro";
+import PlatformLinks from "../components/PlatformLinks.astro";
 ---
 <Base title="Meridian — A design language for interfaces" description="Explore Meridian’s typed UI elements, theme foundations, and renderer coverage.">
   <header class="intro">
@@ -30,7 +30,10 @@ import Quickstart from "../components/Quickstart.astro";
     <a id="renderers" href="/features/">Explore the renderers →</a>
   </section>
 
-  <Quickstart />
+  <section class="chapter" id="start">
+    <h2>Get started</h2>
+    <PlatformLinks />
+  </section>
 </Base>
 
 <style>
