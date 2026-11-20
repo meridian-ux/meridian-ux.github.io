@@ -2,15 +2,14 @@
 import Base from "../../layouts/Base.astro";
 import catalog from "../../content/features.json";
 
-const title = "Products — the tomato-bazel source & build layer";
-const description = "Truss, modgraph, the tbzl CLI, buildbarn RBE, the module registry, and tap — every piece of the tbzl.dev source & build layer, each with its own page.";
+const title = "Renderers — Meridian";
+const description = "Explore Meridian renderers for the web, SwiftUI, and the terminal, plus the shared Rust core compiled to WebAssembly.";
 const features = catalog.features;
 ---
 <Base title={title} description={description}>
   <section class="feature-hero">
-    <span class="eyebrow">the console</span>
-    <h1>Every capability is a <span class="grad-text">plugin.</span></h1>
-    <p class="sub">One console aggregates {features.length} narrowly-scoped services — build, code, agents, workspaces, compliance. Each is discovered at runtime, and each has its own page.</p>
+    <h1>Renderers</h1>
+    <p class="sub">Render the same Meridian descriptor on the web, in a SwiftUI app, or in the terminal. The shared Rust core, compiled to WebAssembly, helps keep interaction behavior consistent across the web and terminal renderers.</p>
   </section>
 
   <section style="padding-top:0">
